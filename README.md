@@ -3,8 +3,10 @@
 A first-person physics rage room for the web. Break things, earn credits, buy better tools and more
 things to break, arrange the room the way you like, and break it all again.
 
-This repository is the **web demo** (about 30 minutes of play). Game data lives in plain JSON so a
-full version can be rebuilt in another engine (Godot) without re-deciding the design.
+This repository is the **web demo**. There is no time limit: the room is persistent and play goes
+on as long as you like (typically around half an hour to the Sledgehammer and a little longer for
+the whole collection). Game data lives in plain JSON so a full version can be rebuilt in another
+engine (Godot) without re-deciding the design.
 
 - Browsers on devices with a keyboard and mouse (PC, or a tablet with both connected). Verified in
   Chromium (Chrome/Edge); Firefox and Safari 16+ are supported targets but still need a manual

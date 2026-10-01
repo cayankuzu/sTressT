@@ -76,7 +76,11 @@ Why the player keeps going:
 - The starter room and the street already show the ladder: two of the six starter objects and five
   of the eight street finds need a better tool than fists.
 
-## Demo scope and pacing (about 30 minutes)
+## Pacing (no time limit)
+
+There is no time limit and no end to the room: after the goals the player can keep buying and
+breaking for as long as they like. What the balance guards is the rhythm: a first upgrade within
+minutes and never a long wait for the next tool. The times below are typical, not limits.
 
 | Time | What the player is doing |
 | --- | --- |
@@ -84,17 +88,18 @@ Why the player keeps going:
 | 2–8 min | Frying Pan, then Baseball Bat: the starter chair and table open up; street finds |
 | 8–18 min | Hammer and Pipe Wrench; collection grows; stacks and chain reactions |
 | 18–30 min | Crowbar and Sledgehammer; big cycles; heavy objects that must be smashed smaller |
-| 30 min + | Completing the collection (all 36 kinds) |
+| Then | Completing the collection (all 36 kinds), and breaking for as long as the player likes |
 
 The economy simulator (`src/economy/simulate.ts`, run by `npm test`) plays the loop with the
 real levels for three player models (each buys one of every new kind first, then the best value
-per second) and prints when each tool is bought and when the collection is complete:
+per second) and prints when each tool is bought, when the collection is complete and the longest
+wait between two tools (its tests keep that wait under 10 / 13 / 16 minutes):
 
-| Player | Pan | Bat | Hammer | Wrench | Crowbar | Sledge | Collection |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Good (cleans everything, combos) | 0.8 min | 3.7 | 5.8 | 12.0 | 15.8 | 20.2 | 26.1 |
-| Average (cleans 75%) | 1.5 | 5.4 | 7.7 | 17.5 | 22.8 | 28.5 | 35.0 |
-| Bad (rarely cleans, misses a lot) | 0.9 | 7.8 | 10.2 | 18.5 | 26.7 | 36.2 | 42.8 |
+| Player | Pan | Bat | Hammer | Wrench | Crowbar | Sledge | Collection | Longest wait |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Good (cleans everything, combos) | 0.8 min | 3.7 | 5.8 | 12.0 | 15.8 | 20.2 | 26.1 | 6.2 |
+| Average (cleans 75%) | 1.5 | 5.4 | 7.7 | 17.5 | 22.8 | 28.5 | 35.0 | 9.8 |
+| Bad (rarely cleans, misses a lot) | 0.9 | 7.8 | 10.2 | 18.5 | 26.7 | 36.2 | 42.8 | 9.6 |
 
 Nobody is ever stuck: see the safety net below. Picking up the last of the seven tools (the main
 goal) ends the demo: a summary (time, objects destroyed, credits earned, pieces thrown away, best combo, objects

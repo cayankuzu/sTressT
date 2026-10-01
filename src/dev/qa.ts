@@ -602,7 +602,7 @@ export async function playthrough(): Promise<Record<string, unknown>> {
     for (let guard = 0; guard < 200 && g.mode === "break"; guard++) {
       const target = g.breakablesInRoom()[0];
       if (!target) break;
-      face(target.currPos, 0.55 + target.template.size[2] / 2, Math.min(0.5, target.template.size[1] / 2));
+      faceObject(target, 0.55);
       H.attack();
       H.advance(0.05);
       H.release();
@@ -661,8 +661,8 @@ export async function playthrough(): Promise<Record<string, unknown>> {
     H.advance(0.2);
     let swings = 0;
     for (; swings < 20 && H.destruction.get(r.objectId)?.alive; swings++) {
-      const o = H.destruction.get(r.objectId);
-      face(o.currPos, 0.8, 0.45);
+      // Aim at what is left of it: a chair knocked over lies low, and a fixed height misses it.
+      faceObject(H.destruction.get(r.objectId), 0.6);
       H.attack();
       H.advance(0.05);
       H.release();

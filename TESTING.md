@@ -14,7 +14,8 @@ npm test        # unit tests only (vitest)
 | `src/destruction/debrisRules.test.ts` | Major/minor classification within budget and world cap, the debris state machine (disposed is final), refracture limits and heavy pieces always breakable |
 | `src/destruction/geometry/geometry.test.ts` | Slicing keeps area and winding, cut points are bit-identical, islands, deterministic fracture for every pattern, bodies with many detail islands still split, chipping, hull tops and bases kept to four corners |
 | `src/economy/economy.test.ts` | Ledger idempotency, purchases and deliveries, the store selling only breakable levels (bench counts), first-break bonus once per kind and the collection bonus once, stage shares adding up to the value, better value per level, tool pick-up, safety box, one-time street finds, old saves' storage delivered once, sessions, ledger pruning, refusals, no input mutation, invariants |
-| `src/economy/simulate.test.ts` | Economy pacing with levels for bad / average / good players (every tool and the whole collection reachable); nobody gets stuck |
+| `src/economy/simulate.test.ts` | Economy rhythm with levels for bad / average / good players: a first upgrade within minutes, never a long wait for the next tool, every tool and the whole collection reachable (no time limit); nobody gets stuck |
+| `src/world/layout.test.ts` | Room confinement: the room, the doorway and the street are left alone; anything behind the room's walls, under its floor, above its ceiling or inside a shop is put back inside |
 | `src/session/session.test.ts` | Exactly-once rewards for all three stages (adding up to the value), first-break bonus once per kind, combo only across different objects, one clear bonus per session, one-hit and chain-reaction bonuses |
 | `src/destruction/geometry/fracture.bench.test.ts` | Fracture timings on real models; skipped unless `BENCH=1` |
 

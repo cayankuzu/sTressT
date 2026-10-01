@@ -3,6 +3,24 @@
 Her yayın sürümü bir artırır ve buraya yazılır. Oyunun ana menüsünün sağ alt köşesinde çalışan
 sürüm görünür.
 
+## 0.1.3 (2026-10-01)
+
+### Düzeltildi
+
+- **Duvardan kaçan parçalar.** Kırılan eşyanın küçük bir kırıntısı nadiren odanın arka duvarından
+  dışarı kaçabiliyordu. Artık odanın duvarlarının arkasında, zemininin altında, tavanının üstünde ya
+  da dükkânların içinde bulunan kırıntı siliniyor; toplanabilir (para eden) bir parça ise odanın
+  içine geri konuyor. Hiçbir parça kaybolmuyor, sokaktaki ve kapıdaki parçalara dokunulmuyor.
+- **Test aracı:** devrilmiş eşyalara sabit yükseklikten nişan aldığı için oynanış testi ara sıra
+  yanlış "kırılamadı" sonucu veriyordu; artık eşyanın kalan parçasına nişan alıyor.
+
+### Değişti
+
+- **Süre sınırı yok.** Oyun yarım saatle sınırlı değil; oda kalıcı ve oyuncu istediği kadar oynar.
+  Ekonominin testleri artık toplam süreyi değil ritmi koruyor: ilk yükseltme birkaç dakika içinde
+  gelir, bir sonraki alet için asla uzun beklenmez (en uzun bekleme ortalama oyuncuda yaklaşık 10
+  dakika) ve herkes bütün aletleri ve koleksiyonu tamamlayabilir.
+
 ## 0.1.2 (2026-10-01)
 
 ### Yeni: seviyeli ekonomi

@@ -156,7 +156,9 @@ damage.ts computeDamage ──► stages.ts applyDamage (intact→damaged→brok
   hits the world, a sphere sweep the width of the striking surface picks a breakable it clips.
 - Pieces never use continuous collision (on thin hulls it makes tunnelling worse). The room has a
   metre of invisible backing behind its walls, floor and ceiling, and `Debris.afterStep` puts a
-  piece found inside the floor back on top. Collider creation falls back to a box if Rapier
+  piece found inside the floor back on top. A last net (`Debris.confine`, set to
+  `confineToRoom` from `world/layout.ts`): behind the north facades only the room is reachable, so
+  clutter found anywhere else there is removed and a collectible piece is put back in the room. Collider creation falls back to a box if Rapier
   rejects a hull (it validates only at creation time).
 - The player's kinematic body is pinned while idle (no input, no drift): a kinematic body given a
   new position every step wakes everything it touches. Teleports land just outside the

@@ -35,7 +35,7 @@ import { type ShopKind, ShopView } from "../ui/shop";
 import { Thumbnails } from "../ui/thumbnails";
 import type { UI } from "../ui/ui";
 import { ToolBench } from "../world/deliveries";
-import { isInRoom, OBJECT_DROP, RECOVERY, ROOM, ROOM_DOOR, ROOM_ENTRY, SPAWN, STREET } from "../world/layout";
+import { confineToRoom, isInRoom, OBJECT_DROP, RECOVERY, ROOM, ROOM_DOOR, ROOM_ENTRY, SPAWN, STREET } from "../world/layout";
 import { Lighting } from "../world/lighting";
 import { buildRageRoom, type RageRoomShell } from "../world/rageRoom";
 import { buildStreet, type StreetSpot } from "../world/street";
@@ -254,6 +254,7 @@ export class Game {
     this.destruction.onObjectLost = (obj) => this.recoverObject(obj);
     this.destruction.onObjectGone = () => this.saves.request();
     this.destruction.breakTier = () => bestTier(this.progress.state.ownedTools);
+    this.destruction.debris.confine = confineToRoom;
     this.destruction.onBlocked = (obj) => this.onBlockedHit(obj);
     this.destruction.onObjectInBin = (obj) => this.hud.showToast(t("toast.binIntact", { name: objectName(obj.definitionId) }), "info", 3);
     this.events.on("ATTACK_STARTED", () => this.audio.swing(this.tools.tool.effectiveMass, this.tools.tool.windup + this.tools.tool.active));

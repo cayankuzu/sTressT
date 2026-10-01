@@ -367,6 +367,13 @@ export class Debris {
   }
 
   /** After each physics step: record transforms, age pieces, enforce budgets. */
+  /**
+   * Where a piece may never be (set by the game from the world layout): returns the place to put
+   * it back, or null when it is fine. Clutter found there is removed; a collectible piece is put
+   * back (it is the player's money). A safety net like the floor rescue: whatever slipped through.
+   */
+  confine: ((x: number, y: number, z: number, margin: number) => [number, number, number] | null) | null = null;
+
   afterStep(dt: number): void {
     const maxV = GAME.physics.maxLinearSpeed;
     for (const f of this.fragments) {
@@ -384,6 +391,19 @@ export class Debris {
         body.setLinvel({ x: 0, y: 0, z: 0 }, true);
         body.setAngvel({ x: 0, y: 0, z: 0 }, true);
         t.y = Math.max(0.02, f.radius * 0.5);
+      }
+      const back = f.state === "held" || !this.confine ? null : this.confine(t.x, t.y, t.z, Math.max(0.05, f.radius));
+      if (back) {
+        if (f.kind !== "major") {
+          this.fadeOut(f, 0.05);
+          continue;
+        }
+        body.setTranslation({ x: back[0], y: back[1], z: back[2] }, true);
+        body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+        body.setAngvel({ x: 0, y: 0, z: 0 }, true);
+        t.x = back[0];
+        t.y = back[1];
+        t.z = back[2];
       }
       const r = body.rotation();
       f.currPos.set(t.x, t.y, t.z);

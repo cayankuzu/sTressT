@@ -52,6 +52,25 @@ export function isInRoom(x: number, z: number): boolean {
   return Math.abs(x - ox) < ROOM.width / 2 && z < STREET.northFacadeZ - STREET.facadeThickness && z > oz - ROOM.depth / 2;
 }
 
+/**
+ * Behind the north facades there is nothing but the rage room. A point there that is outside the
+ * room (behind its walls, under its floor, above its ceiling, inside a shop) cannot be reached by
+ * anything legitimate. Returns the nearest point inside the room, `margin` from its walls, or null
+ * when the point is fine (in the room, in the doorway or anywhere on the street side).
+ */
+export function confineToRoom(x: number, y: number, z: number, margin: number): [number, number, number] | null {
+  const front = STREET.northFacadeZ - STREET.facadeThickness;
+  if (z >= front) return null;
+  const [ox, , oz] = ROOM.origin;
+  const hw = ROOM.width / 2;
+  const back = oz - ROOM.depth / 2;
+  // A little below the floor is the floor rescue's job (it puts the piece back on top).
+  if (Math.abs(x - ox) <= hw && z >= back && y >= -0.05 && y <= ROOM.height) return null;
+  const m = Math.min(margin, hw / 2);
+  const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
+  return [clamp(x, ox - hw + m, ox + hw - m), clamp(y, m, ROOM.height - m), clamp(z, back + m, front - m)];
+}
+
 /** The street waste container: across the road from the rage room, a few seconds' walk. */
 export const TRASH = { x: -2.0, z: 5.88, width: 1.8, depth: 1.05, height: 1.12, wall: 0.05, floorY: 0.16 } as const;
 

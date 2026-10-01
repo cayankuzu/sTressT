@@ -8,7 +8,8 @@ import { cleanupPool, firstBreakBonus } from "./economy";
 /**
  * Economy simulator: plays the real loop (buy, carry, break, clean up, buy again) with the real
  * catalog, prices, levels and damage formula, for players of different skill. Used by the tests
- * to prove every tool and level is reachable in a demo-length session and that nobody can get stuck.
+ * to prove every tool, level and kind of object is reachable, that the next tool is never a long
+ * wait away, and that nobody can get stuck. There is no time limit; the rhythm is what is guarded.
  */
 export type PlayerModel = {
   name: string;

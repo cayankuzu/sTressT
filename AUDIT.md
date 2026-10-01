@@ -216,8 +216,8 @@ Bu bölümdeki sayılar, yukarıdaki tablolardan güncel olanlardır. Depo kald�
 
 Test turu: 66 birim testi; `feedbackAudit`, `inputAudit` ve `controllerAudit` geçti; `playthrough`
 11 turun son 7'sinde art arda geçti. İlk 4 turun 2'si, bazı vuruşlar boşa gittiği için yarım kaldı;
-bu sonra tekrarlanmadı. Muhtemel neden, panelin oyuncuyla paylaşılması ve oyunun duraklamasıydı; artık bu
-durum ölçülüyor ve raporlanıyor.
+bu sonra tekrarlanmadı. O sırada "panel duraklaması" diye tahmin edilmişti; gerçek neden 0.1.3'te
+bulundu (bölüm 11): test aracı devrilen eşyalara sabit yükseklikten nişan alıyordu.
 
 ## 10. Sürüm 0.1.2: seviyeli ekonomi
 
@@ -234,6 +234,21 @@ CHANGELOG.md'de.
 | Seviye atlama | Tava tezgâhtan alınınca "SEVİYE 2 AÇILDI · 6 yeni eşya"; hedef Beyzbol Sopası'na geçiyor |
 | Test aracı | `feedbackAudit`, `inputAudit` ve `playthrough` geçti. Nesne taraması seviye başına örneklerde (vazo, saksı, tabure, cüce) geçti; nesne taraması artık her eşyayı yalnızca onu kırabilen aletlerle deniyor |
 
-Açık kalan, P4: tabure sopayla yakından kırılınca küçük bir kırıntı 3 denemenin 2'sinde arka
+Açık kalan, P4 (0.1.3'te kapatıldı, bölüm 11): tabure sopayla yakından kırılınca küçük bir kırıntı 3 denemenin 2'sinde arka
 duvardan dışarı kaçtı; bağımsız 6 denemede tekrarlanmadı. Kırıntı toplanmıyor, kayda yazılmıyor ve
 kırma bitince siliniyor.
+
+## 11. Sürüm 0.1.3: açık kalanlar kapatıldı
+
+| ID | Öncelik | Hata | Kök neden | Düzeltme | Doğrulama |
+| --- | --- | --- | --- | --- | --- |
+| B22 | P4 | Tabure sopayla kırılınca küçük bir kırıntı bazen arka duvardan dışarı kaçıyordu; zemin kurtarması onu dışarıda sonsuza kadar "kurtarıyordu" | Kesin neden yeniden üretilemedi (16 bağımsız denemede tekrarlamadı) | Son güvenlik ağı (`confineToRoom`): kuzey cephesinin arkasında odadan başka ulaşılabilir yer yok. Orada bulunan kırıntı silinir, toplanacak parça odanın içine geri konur | Birim testi; tarayıcıda duvar arkasına konan parça odaya döndü (z -14,2 → -12,6), kırıntı silindi; oynanış ve test turları geçti |
+| B23 | P3 (test aracı) | Oynanış testi aralıklı olarak (yaklaşık 4 turda 1) "sopa sandalyeyi 20 vuruşta kıramadı" ve "yumruk odayı bitiremedi" diyordu | Test aracı eşyanın tabanının sabit bir yükseklik üstüne nişan alıyordu; ilk darbede devrilip yere yatan sandalyenin üstünden vuruş zemine gidiyordu (19 vuruşun hepsi zeminde). Oyun hatası değil: oyuncu yatan eşyaya bakarak vurur | Oynanış testi de nesne taraması gibi eşyanın kalan en büyük parçasının merkezine nişan alıyor | Düzeltmeden sonra art arda 6/6 tur |
+
+Süre sınırı yok (kullanıcı kararı): ekonomi testleri toplam süre sınırı yerine ritmi koruyor. İlk
+yükseltme birkaç dakika içinde gelmeli, iki alet arasındaki en uzun bekleme iyi / ortalama / zayıf
+oyuncu için 10 / 13 / 16 dakikayı geçmemeli ve 120 dakikalık simülasyonda herkes bütün aletleri ve
+bütün koleksiyonu tamamlamalı.
+
+Açık hata: yok. Elle yapılması gerekenler: Firefox ve Safari'de deneme, gerçek bir düşük donanımlı
+PC'de deneme.

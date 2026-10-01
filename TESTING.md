@@ -36,6 +36,10 @@ await qa.playthrough();            // find, carry, arrange, break, clean up, sho
 Run long audits in batches of about 8 objects (the browser tool times out after 45 s). Results and
 the bug log of the last pass are in [AUDIT.md](AUDIT.md).
 
+Screenshots: the dev server accepts `POST /__qa/capture?name=shot.jpg` with a canvas data URL as
+the body and writes the file to `qa-captures/` (git-ignored). Draw a frame and read the canvas in
+the same task, since the WebGL buffer is not kept between frames.
+
 ## Dev handle (dev builds only)
 
 `npm run dev`, open the console on <http://localhost:5180>, and drive the game through

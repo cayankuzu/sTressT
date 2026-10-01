@@ -1,3 +1,6 @@
+/// <reference types="node" />
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { defineConfig, type Plugin } from "vite";
 
 /**
@@ -22,10 +25,41 @@ function rapierWasm(): Plugin {
   };
 }
 
+/**
+ * Dev server only: `POST /__qa/capture?name=shot.jpg` with a data URL body writes the image to
+ * `qa-captures/` (git-ignored). The QA harness uses it for screenshots of the canvas.
+ */
+function qaCapture(): Plugin {
+  return {
+    name: "stresst-qa-capture",
+    apply: "serve",
+    configureServer(server) {
+      server.middlewares.use("/__qa/capture", (req, res) => {
+        const name = new URL(req.url ?? "", "http://x").searchParams.get("name") ?? "";
+        if (req.method !== "POST" || !/^[a-z0-9-]+\.(jpg|png)$/.test(name)) {
+          res.statusCode = 400;
+          res.end("bad request");
+          return;
+        }
+        const chunks: Buffer[] = [];
+        req.on("data", (c: Buffer) => chunks.push(c));
+        req.on("end", () => {
+          const body = Buffer.concat(chunks).toString("utf8");
+          const base64 = body.slice(body.indexOf(",") + 1);
+          const dir = join(server.config.root, "qa-captures");
+          mkdirSync(dir, { recursive: true });
+          writeFileSync(join(dir, name), Buffer.from(base64, "base64"));
+          res.end("ok");
+        });
+      });
+    },
+  };
+}
+
 export default defineConfig({
   // Relative asset paths so the same build works on a website subfolder and on itch.io.
   base: "./",
-  plugins: [rapierWasm()],
+  plugins: [rapierWasm(), qaCapture()],
   optimizeDeps: {
     // Let the plugin above handle Rapier instead of the dev pre-bundler.
     exclude: ["@dimforge/rapier3d"],

@@ -1,13 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { OBJECTS, TOOLS } from "../data/catalog";
+import { GAME } from "../config/gameConfig";
+import { COLLECTIBLE_IDS, MAX_TIER, OBJECTS, TOOLS } from "../data/catalog";
 import { checksum } from "../save/storage";
 import { migrateLegacy, newSave, validateSaveData } from "../save/schema";
 import {
   checkInvariants,
   claimFoundItem,
   cleanupPool,
+  collectObject,
   comboMultiplier,
   equipTool,
+  firstBreakBonus,
   grantReward,
   pickUpTool,
   pruneLedger,
@@ -75,12 +78,43 @@ describe("economy", () => {
 
   it("gives every bought object a new id, never reused", () => {
     const price = OBJECTS.crt_tv!.price;
-    const a = ok(purchaseObject(withCredits(price * 2), "crt_tv"));
+    const a = ok(purchaseObject({ ...withCredits(price * 2), ownedTools: ["fists", "sledgehammer"] }, "crt_tv"));
     const b = ok(purchaseObject(a.state, "crt_tv"));
     expect(a.objectId).not.toBe(b.objectId);
     expect(b.state.credits).toBe(0);
     expect(purchaseObject(b.state, "crt_tv")).toEqual({ ok: false, reason: "insufficient_funds", missing: price });
     expect(purchaseObject(withCredits(9999), "nope").ok).toBe(false);
+  });
+
+  it("only sells what the player's tools can break (a tool waiting on the bench counts)", () => {
+    const rich = withCredits(99999);
+    expect(purchaseObject(rich, "tea_cup").ok).toBe(true);
+    expect(purchaseObject(rich, "wooden_chair")).toEqual({ ok: false, reason: "tool_required" });
+    expect(purchaseObject({ ...rich, ownedTools: ["fists", "baseball_bat"] }, "wooden_chair").ok).toBe(true);
+    expect(purchaseObject({ ...rich, toolDeliveries: [{ id: "dlv_000001", toolId: "baseball_bat" }] }, "wooden_chair").ok).toBe(true);
+    expect(purchaseObject({ ...rich, ownedTools: ["fists", "baseball_bat"] }, "marble_bust").ok).toBe(false);
+    // Toys never break, so they need no tool.
+    expect(purchaseObject(rich, "rubber_duck").ok).toBe(true);
+  });
+
+  it("pays the first-break bonus once per kind and the collection bonus once, with the last kind", () => {
+    const first = ok(collectObject(defaultProgress(), "tea_cup"));
+    expect(first.amount).toBe(firstBreakBonus(OBJECTS.tea_cup!));
+    expect(first.state.credits).toBe(first.amount);
+    expect(collectObject(first.state, "tea_cup")).toEqual({ ok: false, reason: "already_collected" });
+    expect(collectObject(first.state, "rubber_duck").ok).toBe(false);
+    let s = defaultProgress();
+    let completes = 0;
+    for (const id of COLLECTIBLE_IDS) {
+      const r = ok(collectObject(s, id));
+      if (r.complete) {
+        completes++;
+        expect(r.bonus).toBe(GAME.economy.collectionBonus);
+      } else expect(r.bonus).toBe(0);
+      s = r.state;
+    }
+    expect(completes).toBe(1);
+    expect(checkInvariants(s)).toEqual([]);
   });
 
   it("claims a street find only once", () => {
@@ -121,9 +155,19 @@ describe("economy", () => {
 });
 
 describe("rewards", () => {
-  it("splits an object's break value between broken and destroyed stages", () => {
-    const tv = OBJECTS.crt_tv!;
-    expect(stageReward(tv, "broken") + stageReward(tv, "destroyed")).toBe(tv.value);
+  it("splits an object's break value across the damaged, broken and destroyed stages", () => {
+    for (const def of Object.values(OBJECTS)) {
+      expect(stageReward(def, "damaged") + stageReward(def, "broken") + stageReward(def, "destroyed")).toBe(def.value);
+    }
+    expect(stageReward(OBJECTS.crt_tv!, "destroyed")).toBeGreaterThan(stageReward(OBJECTS.crt_tv!, "broken"));
+  });
+
+  it("pays better for every level up, so the next tool is always worth buying", () => {
+    const roi = (tier: number): number => {
+      const defs = Object.values(OBJECTS).filter((d) => d.capabilities.destructible && d.tier === tier && d.price > 0);
+      return defs.reduce((sum, d) => sum + d.value / d.price, 0) / defs.length;
+    };
+    for (let tier = 2; tier <= MAX_TIER; tier++) expect(roi(tier), `level ${tier}`).toBeGreaterThan(roi(tier - 1));
   });
 
   it("always pays less for cleaning up than for breaking", () => {

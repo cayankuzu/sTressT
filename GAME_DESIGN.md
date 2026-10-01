@@ -41,26 +41,63 @@ fits (under a table the player stays down); a jump from a crouch needs that room
 follow the surface (rubber mats in the room, concrete pavers outside) and the room has its own
 reverb.
 
+## Levels: what breaks what
+
+Every tool is a level, and every breakable object has one. **A tool breaks everything of its own
+level and below; the Sledgehammer (level 7) breaks everything.** A hit from a tool below the
+object's level does no damage at all: a dull knock, a few sparks, the object is pushed but not
+marked, and a note says which tool it needs (or, when the player already owns one, which key to
+press). Kicks, throws and chain reactions reach what the player's best owned tool could break, so
+a thrown box cannot crack a marble bust either. Pieces keep their object's level.
+
+| Level | Tool (price) | Objects of that level | Price band | Value / price |
+| --- | --- | --- | --- | --- |
+| 1 | Fists (free) | Cardboard box, saucer, tea cup, dinner plate, wine bottle, ceramic vase | 20–55 | 1.05 |
+| 2 | Frying Pan (140) | Wet floor sign, champagne bottle, clay pot, jug, picture frame, round vase | 45–80 | 1.08 |
+| 3 | Baseball Bat (300) | Stool, plastic chair, wooden chair, side table, two tall vases | 100–170 | 1.12 |
+| 4 | Hammer (700) | Teapot, garden gnome, cat statue, mirror, antique vase | 160–380 | 1.16 |
+| 5 | Pipe Wrench (1,200) | Alarm clock, desk lamp, small TV, boombox, laptop | 220–440 | 1.20 |
+| 6 | Crowbar (2,000) | School chair, wooden crate, nightstand, wooden table, microwave | 400–620 | 1.25 |
+| 7 | Sledgehammer (3,000) | CRT TV, wooden cabinet, marble bust | 800–1,200 | 1.30 |
+
+Why the player keeps going:
+
+- **The next tool is always the goal.** The HUD shows it under the credits with a progress bar
+  ("140 CR · level 2 · 6 new objects"); it turns green when it is affordable.
+- **Higher levels pay better.** Every level up raises the value-to-price ratio, so buying the next
+  tool is always worth it, and the store groups its stock by level with the locked levels on show.
+- **The store only sells what you can break.** Locked objects are listed with the tool they need;
+  a tool waiting on the bench already counts.
+- **Picking up a tool that opens a level** announces it: "LEVEL 3 UNLOCKED · 6 new objects".
+- **The collection.** The first time each of the 36 kinds of object is destroyed pays +50% of its
+  value ("FIRST TIME!"); breaking all 36 pays a 2,500 CR collection bonus. The HUD counts it, the
+  store marks every kind (✓ collected, ★ new), and once all tools are owned the collection is the
+  goal.
+- The starter room and the street already show the ladder: two of the six starter objects and five
+  of the eight street finds need a better tool than fists.
+
 ## Demo scope and pacing (about 30 minutes)
 
 | Time | What the player is doing |
 | --- | --- |
-| 0–4 min | Learns movement, fists, grab and throw, kick. Breaks the starter room, first cleanup |
-| 4–8 min | Buys the Frying Pan and Baseball Bat; claims street finds, first purchased objects |
-| 8–18 min | Hammer and Pipe Wrench; arranges stacks and chain reactions; cleanup becomes routine |
+| 0–2 min | Learns movement, fists, grab and throw, kick. Breaks the level-1 things in the starter room |
+| 2–8 min | Frying Pan, then Baseball Bat: the starter chair and table open up; street finds |
+| 8–18 min | Hammer and Pipe Wrench; collection grows; stacks and chain reactions |
 | 18–30 min | Crowbar and Sledgehammer; big cycles; heavy objects that must be smashed smaller |
+| 30 min + | Completing the collection (all 36 kinds) |
 
-The economy simulator (`src/economy/simulate.ts`, run by `npm test`) plays the loop with three
-player models and prints when each tool is bought:
+The economy simulator (`src/economy/simulate.ts`, run by `npm test`) plays the loop with the
+real levels for three player models (each buys one of every new kind first, then the best value
+per second) and prints when each tool is bought and when the collection is complete:
 
-| Player | Pan | Bat | Hammer | Wrench | Crowbar | Sledge |
-| --- | --- | --- | --- | --- | --- | --- |
-| Good (cleans everything, combos) | 0.9 min | 2.3 | 4.2 | 7.8 | 12.7 | 16.4 |
-| Average (cleans 75%) | 0.9 | 2.7 | 6.4 | 11.8 | 19.6 | 30.1 |
-| Bad (rarely cleans, misses a lot) | 1.0 | 2.3 | 7.2 | 22.2 | 51.5 | never |
+| Player | Pan | Bat | Hammer | Wrench | Crowbar | Sledge | Collection |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Good (cleans everything, combos) | 0.8 min | 3.7 | 5.8 | 12.0 | 15.8 | 20.2 | 26.1 |
+| Average (cleans 75%) | 1.5 | 5.4 | 7.7 | 17.5 | 22.8 | 28.5 | 35.0 |
+| Bad (rarely cleans, misses a lot) | 0.9 | 7.8 | 10.2 | 18.5 | 26.7 | 36.2 | 42.8 |
 
-Nobody is ever stuck: see the safety net below. Picking up the last of the seven tools ends the
-demo: a summary (time, objects destroyed, credits earned, pieces thrown away, best combo, objects
+Nobody is ever stuck: see the safety net below. Picking up the last of the seven tools (the main
+goal) ends the demo: a summary (time, objects destroyed, credits earned, pieces thrown away, best combo, objects
 thrown) with "keep breaking" or "main menu". It is shown once per save.
 
 ## Tools
@@ -68,18 +105,19 @@ thrown) with "keep breaking" or "main menu". It is shown once per save.
 Power grows with price, and every tool also has a specialty (affinity per material), so cheaper
 tools stay useful. Striking energy is ½·m·v², with m including the arm behind the tool.
 
-| Tool | Price | Energy | Swing (s) | Motion | Best against |
-| --- | --- | --- | --- | --- | --- |
-| Fists | 0 | 45 J | 0.32 | Alternating left/right punches | Cardboard, fragile items |
-| Frying Pan | 150 | 73 J | 0.47 | Diagonal smack | Plastic, glass, electronics |
-| Baseball Bat | 300 | 141 J | 0.56 | Horizontal sweep, long reach | Wood, plastic |
-| Hammer | 450 | 76 J | 0.41 | Overhead chop, tiny face | Ceramic, glass, screens, stone |
-| Pipe Wrench | 700 | 148 J | 0.50 | Diagonal whack | Metal, electronics, stone |
-| Crowbar | 1,000 | 127 J | 0.51 | Hooked chop | Wood joints, metal |
-| Sledgehammer | 1,500 | 316 J | 0.85 | Heavy overhead | Everything; chairs and nightstands in one square hit |
+| Level | Tool | Price | Energy | Swing (s) | Motion | Best against |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | Fists | 0 | 45 J | 0.32 | Alternating left/right punches | Cardboard, fragile items |
+| 2 | Frying Pan | 140 | 73 J | 0.47 | Diagonal smack | Plastic, glass, electronics |
+| 3 | Baseball Bat | 300 | 141 J | 0.56 | Horizontal sweep, long reach | Wood, plastic |
+| 4 | Hammer | 700 | 76 J | 0.41 | Overhead chop, tiny face | Ceramic, glass, screens, stone |
+| 5 | Pipe Wrench | 1,200 | 148 J | 0.50 | Diagonal whack | Metal, electronics, stone |
+| 6 | Crowbar | 2,000 | 127 J | 0.51 | Hooked chop | Wood joints, metal |
+| 7 | Sledgehammer | 3,000 | 316 J | 0.85 | Heavy overhead | Everything; chairs and nightstands in one square hit |
 
 Ideal direct hits to destroy (from the balance formula, assuming square hits; real swings land at
-an angle, so expect roughly 1.5–2× as many in practice):
+an angle, so expect roughly 1.5–2× as many in practice). Since levels, a tool below the object's
+level does nothing at all; the figures show what the raw power would be:
 
 | Object (HP) | Fists | Pan | Bat | Hammer | Wrench | Crowbar | Sledge |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -150,18 +188,25 @@ tear (cardboard, sheet metal), chunk (stone, plastic, electronics).
 - Credits are created only through reward ids in an idempotent ledger and spent only through the
   economy reducers (`src/economy/economy.ts`); a reward id can never pay twice:
   `brk:<object>:<stage>`, `cln:<piece>`, `clr:<session>`.
-- Object value = 1.05 × price. **Breaking** pays 75% of it: 25% at broken, the rest at
-  destroyed. **Cleanup** pays the other 25%, shared by the object's major pieces by size. Breaking
-  is always worth more than cleaning, but skipping cleanup leaves a quarter on the table and a
+- Object value = price × the level's ratio (1.05 at level 1 up to 1.30 at level 7). **Breaking**
+  pays all of it, stage by stage: 10% at the first real damage (HASAR), 25% at broken (KIRILDI),
+  the rest at destroyed (PARÇALANDI); a hit that crosses several stages shows one popup with the
+  sum. **Cleanup** pays another 25%, shared by the object's major pieces by size. Breaking is
+  always worth more than cleaning, but skipping cleanup leaves a quarter on the table and a
   cluttered room.
+- **First time** a kind of object is destroyed: +50% of its value, once per save (the collection).
+  All 36 kinds: +2,500.
 - **Combo**: each *different* object hit within 2.5 s adds +10% (up to ×1.6). **ONE HIT** (intact to
   destroyed in one impact): +20% of the value. **CHAIN REACTION** (destroyed by a thrown object,
   debris or a collapse): +25%.
 - **Room clear**: when the stress meter is empty, +10% of the value destroyed in that session.
 - Bought objects are consumed when broken: income comes from buying, breaking and cleaning again.
 - Street finds (eight objects around the street) are free; each can be claimed once.
-- **Safety net**: with no credits for the cheapest object and nothing breakable left, the Object
-  Store gives a free cardboard box. Nobody can get stuck.
+- **Safety net**: with no credits for the cheapest object and nothing the player's tools can break,
+  the Object Store gives a free cardboard box (level 1). Nobody can get stuck.
+- A break session counts only what the player's tools can break: the stress meter empties and the
+  room clears without the locked objects, and break mode says which tool a room of locked objects
+  needs.
 - Rubber items and the metal barrel are indestructible props.
 - Cleaning pays as each piece settles in the container: a "+N · TEMİZLİK" popup above it (pieces
   landing together share one). A whole object thrown in stays there, with a note to break it first.

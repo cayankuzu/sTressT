@@ -5,6 +5,8 @@ type Popup = { el: HTMLElement; age: number; x: number; y: number };
 
 export type ModeId = "arrange" | "break" | "cleanup";
 export type ModeBarItem = { id: ModeId; enabled: boolean; reason: string | null };
+/** The goal under the credits: the next tool (with how far the credits are), then the collection. */
+export type Goal = { title: string; detail: string; sub: string; ratio: number; collection: string; ready: boolean };
 
 const POPUP_LIFE = 1.1;
 
@@ -31,6 +33,14 @@ export class Hud {
   private readonly health: HTMLElement;
   private readonly healthName: HTMLElement;
   private readonly healthFill: HTMLElement;
+  private readonly healthLock: HTMLElement;
+  private readonly goal: HTMLElement;
+  private readonly goalTitle: HTMLElement;
+  private readonly goalFill: HTMLElement;
+  private readonly goalDetail: HTMLElement;
+  private readonly goalSub: HTMLElement;
+  private readonly goalCollection: HTMLElement;
+  private goalKey = "";
   private readonly toast: HTMLElement;
   private readonly summaryEl: HTMLElement;
   private readonly hintEl: HTMLElement;
@@ -68,7 +78,25 @@ export class Hud {
     this.modeBar.hidden = true;
     this.healthName = h("div", { class: "hp-name" });
     this.healthFill = h("div", { class: "bar-fill" });
-    this.health = h("div", { class: "hud-hp" }, this.healthName, h("div", { class: "bar thin" }, this.healthFill));
+    this.healthLock = h("div", { class: "hp-lock" });
+    this.healthLock.hidden = true;
+    this.health = h("div", { class: "hud-hp" }, this.healthName, h("div", { class: "bar thin" }, this.healthFill), this.healthLock);
+    this.goalTitle = h("div", { class: "goal-title" });
+    this.goalFill = h("div", { class: "bar-fill" });
+    this.goalDetail = h("div", { class: "goal-detail" });
+    this.goalSub = h("div", { class: "goal-sub" });
+    this.goalCollection = h("div", { class: "goal-collection" });
+    this.goal = h(
+      "div",
+      { class: "hud-goal" },
+      h("div", { class: "hud-label", text: t("hud.goal") }),
+      this.goalTitle,
+      h("div", { class: "bar thin" }, this.goalFill),
+      this.goalDetail,
+      this.goalSub,
+      this.goalCollection,
+    );
+    this.goal.hidden = true;
     this.health.hidden = true;
     this.toast = h("div", { class: "hud-toast" });
     this.toast.hidden = true;
@@ -85,6 +113,7 @@ export class Hud {
       this.prompt,
       this.stressWrap,
       this.credits,
+      this.goal,
       h("div", { class: "hud-tool" }, this.tool, this.slots),
       this.combo,
       this.mode,
@@ -186,13 +215,33 @@ export class Hud {
     this.modeBar.hidden = true;
   }
 
-  /** World-space health bar; null hides. x/y in CSS pixels. */
-  setHealth(target: { name: string; ratio: number; x: number; y: number } | null): void {
+  /** World-space health bar; null hides. x/y in CSS pixels. `lock` = the tool it needs, when the current one cannot hurt it. */
+  setHealth(target: { name: string; ratio: number; x: number; y: number; lock?: string | null } | null): void {
     this.health.hidden = target === null;
     if (!target) return;
     if (this.healthName.textContent !== target.name) this.healthName.textContent = target.name;
+    const lock = target.lock ?? "";
+    if (this.healthLock.textContent !== lock) this.healthLock.textContent = lock;
+    this.healthLock.hidden = !lock;
+    this.health.classList.toggle("locked", !!lock);
     this.healthFill.style.transform = `scaleX(${Math.max(0, Math.min(1, target.ratio))})`;
     this.health.style.transform = `translate(${Math.round(target.x)}px, ${Math.round(target.y)}px) translate(-50%, -100%)`;
+  }
+
+  /** The goal panel under the credits; null hides it. Only touches the DOM when something changed. */
+  setGoal(goal: Goal | null): void {
+    const key = goal ? `${goal.title}|${goal.detail}|${goal.sub}|${goal.ratio.toFixed(3)}|${goal.collection}|${goal.ready}` : "";
+    if (key === this.goalKey) return;
+    this.goalKey = key;
+    this.goal.hidden = goal === null;
+    if (!goal) return;
+    this.goalTitle.textContent = goal.title;
+    this.goalDetail.textContent = goal.detail;
+    this.goalSub.textContent = goal.sub;
+    this.goalSub.hidden = !goal.sub;
+    this.goalCollection.textContent = goal.collection;
+    this.goalFill.style.transform = `scaleX(${Math.max(0, Math.min(1, goal.ratio))})`;
+    this.goal.classList.toggle("ready", goal.ready);
   }
 
   /** "+12 CR" popup drifting up from a screen position. */

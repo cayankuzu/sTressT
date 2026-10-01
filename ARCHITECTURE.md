@@ -102,9 +102,17 @@ damage.ts computeDamage ──► stages.ts applyDamage (intact→damaged→brok
 ## Economy, save and session
 
 - `economy/state.ts` + `economy/economy.ts`: pure reducers (`grantReward`, `purchaseTool`,
-  `pickUpTool`, `purchaseObject`, `grantSafetyObject`, `claimFoundItem`, `storeObject`,
+  `pickUpTool`, `purchaseObject`, `grantSafetyObject`, `claimFoundItem`, `collectObject`,
   `beginSession`, `pruneLedger`, ...) returning `{ ok, state } | { ok: false, reason }`, plus
-  invariant checks. Rewards go through an idempotent ledger keyed `brk:` / `cln:` / `clr:`.
+  invariant checks. Rewards go through an idempotent ledger keyed `brk:` / `cln:` / `clr:`; the
+  collection (`progress.collection`, kinds destroyed once) pays its first-break bonus by
+  membership, so it needs no ledger key.
+- Levels (`data/catalog.ts`: `canBreak`, `bestTier`, `toolForTier`, `objectsOfTier`): tools and
+  objects carry `tier` 1..7. `DestructionSystem` gates every damage path: a tool hit uses the
+  tool's level, kicks/throws/collisions use `breakTier()` (the player's best owned tool), pieces
+  use their object's level. A locked hit is applied with zero energy (push only) and reported
+  through `onBlocked`; `purchaseObject` refuses levels the player's tools (bench included) cannot
+  break.
 - `economy/simulate.ts`: deterministic economy simulator (bad, average, good player); its tests
   guard the pacing and the "never stuck" rule.
 - `game/Progress.ts` holds the progress in memory and applies reducers; every change asks the

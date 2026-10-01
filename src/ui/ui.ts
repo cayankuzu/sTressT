@@ -32,6 +32,11 @@ function logo(): HTMLElement {
   return h("h1", { class: "logo" }, "s", h("span", { text: "T" }), "ress", h("span", { text: "T" }));
 }
 
+/** Copyright on the left, "Powered by MeMoDe" and the running version on the right. */
+function footer(): HTMLElement {
+  return h("footer", { class: "app-footer" }, h("span", { text: t("app.copyright") }), h("span", { text: `${t("app.poweredBy")} · v${__APP_VERSION__}` }));
+}
+
 /** Owns the DOM layer: a persistent HUD plus at most one modal overlay at a time. */
 export class UI {
   readonly hudLayer: HTMLElement;
@@ -58,7 +63,7 @@ export class UI {
   loading(): LoadingView {
     const bar = h("div");
     const status = h("p", { class: "muted", text: t("app.loading") });
-    this.setOverlay(h("div", { class: "screen solid" }, logo(), h("div", { class: "progress" }, bar), status));
+    this.setOverlay(h("div", { class: "screen solid" }, logo(), h("div", { class: "progress" }, bar), status, footer()));
     return {
       setProgress(loaded, total) {
         bar.style.width = `${total > 0 ? Math.round((loaded / total) * 100) : 0}%`;
@@ -92,7 +97,7 @@ export class UI {
         h("div", { class: "menu" }, contWrap, button(t("menu.newGame"), handlers.onNewGame, info.continueInfo ? "ghost" : "primary"), button(t("menu.savedGames"), handlers.onSavedGames), button(t("menu.settings"), handlers.onSettings)),
         info.storageWarning ? h("p", { class: "notice-warn", text: t("app.noStorage") }) : null,
         info.noMouse ? h("p", { class: "notice-warn", text: t("app.noMouse") }) : controlsHint(),
-        h("span", { class: "app-version", text: `v${__APP_VERSION__}` }),
+        footer(),
       ),
     );
   }
@@ -134,6 +139,7 @@ export class UI {
           full ? h("p", { class: "muted small", text: t("profile.limit", { max: opts.max }) }) : null,
           handlers.back ? h("div", { class: "dialog-actions" }, button(t("profile.back"), handlers.back)) : null,
         ),
+        footer(),
       ),
     );
   }
@@ -206,6 +212,7 @@ export class UI {
         h("dl", { class: "demo-stats" }, ...stats.flatMap(([label, value]) => [h("dt", { text: label }), h("dd", { text: value })])),
         h("div", { class: "dialog-actions" }, button(t("pause.mainMenu"), handlers.onMainMenu), button(t("demo.continue"), handlers.onContinue, "primary")),
       ),
+      footer(),
     );
     el.addEventListener("keydown", (e) => {
       if (e.key === "Escape") handlers.onContinue();

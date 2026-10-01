@@ -1,5 +1,5 @@
 import { GAME } from "../config/gameConfig";
-import { OBJECTS, TOOLS } from "../data/catalog";
+import { bestTier, COLLECTIBLE_IDS, OBJECTS, TOOLS } from "../data/catalog";
 import type { ObjectDefinition } from "../data/types";
 import { cloneProgress, type ProgressState } from "./state";
 
@@ -19,7 +19,9 @@ export type Refusal =
   | "not_for_sale"
   | "no_delivery"
   | "not_owned"
-  | "already_claimed";
+  | "already_claimed"
+  | "tool_required"
+  | "already_collected";
 
 export type Result<T = object> = ({ ok: true; state: ProgressState } & T) | { ok: false; reason: Refusal; missing?: number };
 
@@ -76,11 +78,20 @@ export function equipTool(state: ProgressState, toolId: string): Result {
   return { ok: true, state: next };
 }
 
-/** Pays a new object; the caller places the new instance (with this id) in front of the store. */
+/** Highest level the player can break with tools already bought (a tool waiting on the bench counts). */
+export function unlockedTier(state: ProgressState): number {
+  return bestTier([...state.ownedTools, ...state.toolDeliveries.map((d) => d.toolId)]);
+}
+
+/**
+ * Pays a new object; the caller places the new instance (with this id) in front of the store.
+ * The store only sells what the player can break: a higher level needs its tool first.
+ */
 export function purchaseObject(state: ProgressState, definitionId: string): Result<{ objectId: string }> {
   const def = OBJECTS[definitionId];
   if (!def) return refuse("unknown_object");
   if (!Number.isInteger(def.price) || def.price <= 0) return refuse("not_for_sale");
+  if (def.capabilities.destructible && def.tier > unlockedTier(state)) return refuse("tool_required");
   if (state.credits < def.price) return refuse("insufficient_funds", def.price - state.credits);
   const next = cloneProgress(state);
   next.credits -= def.price;
@@ -107,6 +118,24 @@ export function claimFoundItem(state: ProgressState, foundId: string): Result {
   const next = cloneProgress(state);
   next.claimedFoundItems.push(foundId);
   return { ok: true, state: next };
+}
+
+/**
+ * The first time a kind of object is destroyed it joins the collection and pays a bonus; the one
+ * that completes the collection pays the collection bonus as well. Never twice per kind.
+ */
+export function collectObject(state: ProgressState, definitionId: string): Result<{ amount: number; complete: boolean; bonus: number }> {
+  const def = OBJECTS[definitionId];
+  if (!def || !def.capabilities.destructible) return refuse("unknown_object");
+  if (state.collection.includes(definitionId)) return refuse("already_collected");
+  const next = cloneProgress(state);
+  next.collection.push(definitionId);
+  const complete = COLLECTIBLE_IDS.every((id) => next.collection.includes(id));
+  const amount = firstBreakBonus(def);
+  const bonus = complete ? GAME.economy.collectionBonus : 0;
+  next.credits += amount + bonus;
+  next.statistics.creditsEarned += amount + bonus;
+  return { ok: true, state: next, amount, complete, bonus };
 }
 
 /** A new break session: returns its id (unique for the whole save). */
@@ -139,18 +168,26 @@ export function checkInvariants(state: ProgressState): string[] {
   }
   if (new Set(state.toolDeliveries.map((d) => d.toolId)).size !== state.toolDeliveries.length) problems.push("duplicate tool delivery");
   if (new Set(state.rewardLedger).size !== state.rewardLedger.length) problems.push("duplicate reward key");
+  if (new Set(state.collection).size !== state.collection.length) problems.push("duplicate collection entry");
+  for (const id of state.collection) if (!OBJECTS[id]?.capabilities.destructible) problems.push(`unknown collected object ${id}`);
   return problems;
 }
 
 // ---------------------------------------------------------------- rewards
 
-export type RewardStage = "broken" | "destroyed";
+export type RewardStage = "damaged" | "broken" | "destroyed";
 
-/** Deterministic payout for one destruction stage of one object (before combo). */
+/** Deterministic payout for one destruction stage of one object (before combo); the three add up to its value. */
 export function stageReward(def: ObjectDefinition, stage: RewardStage): number {
   const value = Math.max(0, def.value);
+  const damaged = Math.round(value * GAME.economy.damagedShare);
   const broken = Math.round(value * GAME.economy.brokenShare);
-  return stage === "broken" ? broken : value - broken;
+  return stage === "damaged" ? damaged : stage === "broken" ? broken : value - damaged - broken;
+}
+
+/** Paid once per kind of object, the first time one is destroyed. */
+export function firstBreakBonus(def: ObjectDefinition): number {
+  return Math.round(Math.max(0, def.value) * GAME.economy.firstBreakShare);
 }
 
 /** The whole cleanup pool of an object, shared by its major debris. Always below its break value. */

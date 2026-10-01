@@ -325,6 +325,8 @@ function progress(v: unknown): ProgressState {
     equippedToolId: equipped,
     toolDeliveries: deliveries,
     claimedFoundItems: strings(v.claimedFoundItems).filter((id) => ROOM.foundItems.some((f) => f.id === id)),
+    // Older saves have no collection: every kind pays its first-break bonus once more.
+    collection: strings(v.collection).filter((id) => OBJECTS[id]?.capabilities.destructible),
     rewardLedger: strings(v.rewardLedger),
     counters: { object: count(counters.object), delivery: count(counters.delivery), session: count(counters.session) },
     statistics: statistics(v.statistics),

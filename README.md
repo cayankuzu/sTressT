@@ -69,13 +69,17 @@ still turns the camera directly, and your next click on the game captures it.
    Shop, bought objects on the sidewalk in front of the Object Store: pick them up and carry them.
 3. **Arrange.** Place objects in the room with a ghost preview that snaps to surfaces and never
    pushes anything. Nothing can be damaged in this mode.
-4. **Break.** TAB ▸ KIR locks the door. Objects pay when they break and when they are destroyed,
-   with combo, one-hit, chain-reaction and room-clear bonuses.
+4. **Break.** TAB ▸ KIR locks the door. Objects pay at every stage (damaged, broken, destroyed),
+   with combo, one-hit, chain-reaction, first-time and room-clear bonuses.
 5. **Clean up.** TAB ▸ TEMİZLE opens the door. Carry the big pieces to the container across the
    road; each one that settles inside pays its share of the cleanup reward.
 
-6. **Demo end.** Picking up the last tool ends the demo with your numbers (time, objects destroyed,
-   credits, pieces thrown away, best combo); you can keep breaking afterwards.
+6. **Levels.** Every tool is a level (1 fists … 7 sledgehammer) and every object needs one: a tool
+   below the object's level does nothing to it. The store sells what your tools can break and
+   shows the rest locked; the HUD always shows the next tool to save for and the collection.
+7. **Goals.** Getting the Sledgehammer ends the demo with your numbers (time, objects destroyed,
+   credits, pieces thrown away, best combo, collection); then break every one of the 36 kinds of
+   object for the collection bonus.
 
 The room never resets: what you break stays broken until you clean it up. Progress (credits,
 tools, every object and piece, damage) is saved automatically and from the pause menu, in up to
@@ -125,3 +129,10 @@ re-pivots, re-textures (WebP) and compresses them into `public/assets/`, and reg
 
 TypeScript (strict), [three.js](https://threejs.org) for rendering,
 [Rapier](https://rapier.rs) (WebAssembly) for physics, Vite for building. No UI framework.
+
+## Copyright
+
+© 2026 MeMoDe. All rights reserved. sTressT is made and published by MeMoDe ("Powered by
+MeMoDe"); its code, design and game data may not be copied or redistributed without permission.
+Third-party models, textures and sounds keep their own licenses, listed in
+[ASSET_LICENSES.md](ASSET_LICENSES.md).

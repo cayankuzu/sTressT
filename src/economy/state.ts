@@ -40,6 +40,8 @@ export type ProgressState = {
   toolDeliveries: ToolDelivery[];
   /** Street finds already taken (they never come back). */
   claimedFoundItems: string[];
+  /** Kinds of object destroyed at least once (the collection; each pays a first-break bonus once). */
+  collection: string[];
   /**
    * Idempotency keys of every reward still relevant: `brk:<object>:<stage>`, `cln:<debris>`,
    * `clr:<session>`. A reward whose key is here can never be paid again.
@@ -71,6 +73,7 @@ export function defaultProgress(): ProgressState {
     equippedToolId: STARTER_TOOL_ID,
     toolDeliveries: [],
     claimedFoundItems: [],
+    collection: [],
     rewardLedger: [],
     counters: { object: 0, delivery: 0, session: 0 },
     statistics: { ...EMPTY_STATS },
@@ -84,6 +87,7 @@ export function cloneProgress(state: ProgressState): ProgressState {
     ownedTools: [...state.ownedTools],
     toolDeliveries: state.toolDeliveries.map((d) => ({ ...d })),
     claimedFoundItems: [...state.claimedFoundItems],
+    collection: [...state.collection],
     rewardLedger: [...state.rewardLedger],
     counters: { ...state.counters },
     statistics: { ...state.statistics },

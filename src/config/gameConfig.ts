@@ -128,12 +128,20 @@ export const GAME = {
   },
 
   economy: {
-    /** Share of an object's value paid when it first gives way; the rest when it is destroyed. */
+    /**
+     * Share of an object's value paid at each stage: the first real damage, structural failure;
+     * the rest when it is destroyed.
+     */
+    damagedShare: 0.1,
     brokenShare: 0.25,
     /** Paid on top of the break value, split across the object's major debris, when disposed. */
     cleanupShare: 0.25,
     /** Paid when the stress meter empties: share of the value destroyed in that session. */
     clearBonusShare: 0.1,
+    /** The first time each kind of object is destroyed (once per save): share of its value. */
+    firstBreakShare: 0.5,
+    /** Destroying every kind of object at least once. */
+    collectionBonus: 2500,
     startingCredits: 0,
   },
 

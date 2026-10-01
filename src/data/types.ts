@@ -41,7 +41,7 @@ export type ToolDefinition = {
   tagline: string;
   description: string;
   price: number;
-  /** Shop order; higher tiers are later progression. */
+  /** Level 1..7 (fists = 1): the tool breaks every object of this level or lower. Also shop order. */
   tier: number;
   model: string;
   /** Effective striking mass including the arm driving it (kg). */
@@ -103,6 +103,8 @@ export type ObjectDefinition = {
   value: number;
   /** Object store price; 0 = not sold (starter-only). */
   price: number;
+  /** Level 1..7: only a tool of this level or higher can damage it (see GAME_DESIGN "Levels"). */
+  tier: number;
   stress: number;
   capabilities: ObjectCapabilities;
   /** Uniform scale applied to the model (1 = source size). */

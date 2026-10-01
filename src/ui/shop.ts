@@ -1,7 +1,8 @@
-import { MATERIALS, OBJECTS, TOOL_IDS, TOOLS } from "../data/catalog";
+import { canBreak, MATERIALS, OBJECTS, objectsOfTier, TOOL_IDS, TOOLS, toolForTier } from "../data/catalog";
 import type { MaterialType, ObjectCategory, ObjectDefinition, ToolDefinition } from "../data/types";
 import { kineticEnergy } from "../destruction/damage";
 import { majorPieceCount } from "../destruction/debrisRules";
+import { cleanupPool, firstBreakBonus, unlockedTier } from "../economy/economy";
 import type { ProgressState } from "../economy/state";
 import type { Outcome } from "../game/Progress";
 import { button, h } from "./dom";
@@ -28,7 +29,7 @@ const MAX_REACH = Math.max(...Object.values(TOOLS).map((tl) => tl.reach));
 /** Ignores repeat clicks on BUY for a moment (each click is still validated by the economy). */
 const CLICK_LOCK_MS = 350;
 
-function tier(value: number, [low, mid, high]: [number, number, number]): string {
+function grade(value: number, [low, mid, high]: [number, number, number]): string {
   if (value < low) return t("tier.low");
   if (value < mid) return t("tier.medium");
   if (value < high) return t("tier.high");
@@ -110,15 +111,26 @@ export class ShopView {
         }),
       );
     }
+    // Objects are listed by level (toys, which never break, last), cheapest first within a level.
+    const level = (id: string): number => (OBJECTS[id]?.capabilities.destructible ? (OBJECTS[id]?.tier ?? 1) : 99);
     const ids =
       this.kind === "tools"
         ? TOOL_IDS.filter((id) => id !== "fists")
         : Object.keys(OBJECTS)
             .filter((id) => (OBJECTS[id]?.price ?? 0) > 0 && (this.category === "all" || OBJECTS[id]?.category === this.category))
-            .sort((a, b) => (OBJECTS[a]?.price ?? 0) - (OBJECTS[b]?.price ?? 0));
+            .sort((a, b) => level(a) - level(b) || (OBJECTS[a]?.price ?? 0) - (OBJECTS[b]?.price ?? 0));
     if (!ids.includes(this.selected) && ids[0]) this.selected = ids[0];
     const safety = this.kind === "objects" && this.safetyAvailable ? this.safetyRow() : null;
-    this.list.replaceChildren(...(safety ? [safety] : []), ...ids.map((id) => this.row(id)));
+    const rows: HTMLElement[] = [];
+    let group = -1;
+    for (const id of ids) {
+      if (this.kind === "objects" && level(id) !== group) {
+        group = level(id);
+        rows.push(this.groupHeader(group));
+      }
+      rows.push(this.row(id));
+    }
+    this.list.replaceChildren(...(safety ? [safety] : []), ...rows);
     this.detail.replaceChildren(...(this.kind === "tools" ? this.toolDetail(this.selected) : this.objectDetail(this.selected)));
   }
 
@@ -138,6 +150,18 @@ export class ShopView {
       slot.replaceChildren(img);
     });
     return slot;
+  }
+
+  /** "LEVEL 3 · BASEBALL BAT" above a level's objects; dimmed with a lock until that tool is bought. */
+  private groupHeader(level: number): HTMLElement {
+    if (level > 7) return h("div", { class: "shop-group", text: t("shop.groupToys") });
+    const open = level <= unlockedTier(this.state);
+    return h("div", { class: `shop-group${open ? "" : " locked"}`, text: `${open ? "" : "🔒 "}${t("shop.group", { n: level, tool: toolName(toolForTier(level)).toLocaleUpperCase() })}` });
+  }
+
+  /** Bought and broken at least once (the collection). */
+  private collected(id: string): boolean {
+    return this.state.collection.includes(id);
   }
 
   private toolBadge(id: string): string {
@@ -164,13 +188,20 @@ export class ShopView {
       price = o.price;
       model = o.model;
     }
+    const o = this.kind === "objects" ? (OBJECTS[id] as ObjectDefinition) : null;
+    const locked = !!o && o.capabilities.destructible && o.tier > unlockedTier(this.state);
     const affordable = this.state.credits >= price;
+    const level = this.kind === "tools" ? (TOOLS[id] as ToolDefinition).tier : o?.capabilities.destructible ? o.tier : 0;
+    const chip = level > 0 ? h("span", { class: "row-level", text: t("hud.level", { n: level }) }) : null;
+    // A kind already broken once is marked as collected; a new kind shows its first-break bonus.
+    const mark = o?.capabilities.destructible ? h("span", { class: `row-mark${this.collected(id) ? " done" : ""}`, text: this.collected(id) ? "✓" : "★", attrs: { title: this.collected(id) ? t("shop.collected") : t("shop.newKind") } }) : null;
     const row = h(
       "button",
-      { class: `shop-row${id === this.selected ? " on" : ""}`, attrs: { type: "button", role: "option", "aria-selected": String(id === this.selected) } },
+      { class: `shop-row${id === this.selected ? " on" : ""}${locked ? " locked" : ""}`, attrs: { type: "button", role: "option", "aria-selected": String(id === this.selected) } },
       this.thumb(model),
-      h("span", { class: "row-name", text: name }),
-      h("span", { class: `row-price${affordable || badge ? "" : " short"}`, text: badge || (price === 0 ? t("shop.free") : formatCredits(price)) }),
+      h("span", { class: "row-name" }, name, mark),
+      chip,
+      h("span", { class: `row-price${affordable || badge || locked ? "" : " short"}`, text: badge || (locked ? "🔒" : price === 0 ? t("shop.free") : formatCredits(price)) }),
     );
     row.addEventListener("click", () => {
       this.selected = id;
@@ -209,10 +240,18 @@ export class ShopView {
       .filter(([, v]) => (v ?? 1) > 1)
       .sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0))
       .map(([m]) => matName(m));
+    const opens = objectsOfTier(tl.tier);
     return [
       this.thumb(tl.model, true),
       h("h3", { class: "detail-name", text: toolName(id) }),
       h("p", { class: "tagline-sm", text: toolTagline(id) }),
+      h(
+        "div",
+        { class: "unlocks" },
+        h("div", { class: "unlocks-head", text: `${t("shop.toolLevel", { n: tl.tier })} · ${t("shop.toolBreaks", { n: tl.tier })}` }),
+        h("div", { class: "unlocks-label", text: t("shop.toolOpens", { n: opens.length }) }),
+        h("div", { class: "unlocks-list", text: opens.map(objectName).join(" · ") }),
+      ),
       h("p", { class: "detail-desc", text: toolDescription(id) }),
       h(
         "div",
@@ -231,13 +270,25 @@ export class ShopView {
   private objectDetail(id: string): HTMLElement[] {
     const o = OBJECTS[id];
     if (!o) return [];
-    const primary = button(t("shop.buy"), () => this.act(() => this.actions.buyObject(id), t("shop.boughtObject", { name: objectName(id) })), "primary");
-    primary.disabled = this.state.credits < o.price;
+    const breakable = o.capabilities.destructible;
+    const locked = breakable && o.tier > unlockedTier(this.state);
+    const need = toolName(toolForTier(o.tier));
+    const primary = button(locked ? t("shop.needTool", { tool: need.toLocaleUpperCase() }) : t("shop.buy"), () => this.act(() => this.actions.buyObject(id), t("shop.boughtObject", { name: objectName(id) })), "primary");
+    primary.disabled = locked || this.state.credits < o.price;
+    const first = breakable && !this.collected(id) ? firstBreakBonus(o) : 0;
+    const earn = Math.round(o.value + cleanupPool(o)) + first;
+    const usable = TOOL_IDS.filter((tid) => this.state.ownedTools.includes(tid) && canBreak(TOOLS[tid]?.tier ?? 1, o)).map(toolName);
     const materials = new Set<MaterialType>([o.material, ...(o.zones ?? []).map((z) => z.material)]);
     const facts: [string, string][] = [
+      ...(breakable
+        ? ([
+            [t("shop.fact.level"), `${o.tier} · ${t("shop.fact.needs", { tool: need })}`],
+            [t("shop.fact.earn"), `${formatCredits(earn)} (${t("shop.fact.profit", { credits: formatCredits(earn - o.price) })})`],
+          ] as [string, string][])
+        : []),
       [t("shop.fact.material"), [...materials].map(matName).join(" / ")],
       [t("shop.fact.weight"), `${o.mass} kg`],
-      [t("shop.fact.durability"), o.capabilities.destructible ? tier(o.health, [80, 250, 600]) : t("shop.unbreakable")],
+      [t("shop.fact.durability"), o.capabilities.destructible ? grade(o.health, [80, 250, 600]) : t("shop.unbreakable")],
       [t("shop.fact.value"), o.value > 0 ? formatCredits(o.value) : t("shop.toy")],
       [t("shop.fact.breaks"), o.capabilities.destructible ? t(`pattern.${MATERIALS[o.material].pattern}` as TextKey) : "—"],
       [t("shop.fact.pieces"), o.capabilities.destructible ? String(majorPieceCount(o)) : "—"],
@@ -247,6 +298,17 @@ export class ShopView {
       h("h3", { class: "detail-name", text: objectName(id) }),
       h("p", { class: "detail-desc", text: objectDescription(id) }),
       h("dl", { class: "facts" }, ...facts.flatMap(([k, v]) => [h("dt", { text: k }), h("dd", { text: v })])),
+      breakable
+        ? h(
+            "p",
+            { class: `collect-note${locked ? " locked" : first > 0 ? " new" : ""}` },
+            locked
+              ? t("shop.locked", { tool: need, n: o.tier })
+              : first > 0
+                ? t("shop.firstBonus", { credits: formatCredits(first) })
+                : t("shop.collectedLine", { tools: usable.join(", ") }),
+          )
+        : null,
       h(
         "p",
         { class: "tags" },
@@ -254,8 +316,8 @@ export class ShopView {
           .filter((x): x is string => x !== null)
           .map((x) => h("span", { class: "tag", text: x })),
       ),
-      this.purchaseArea(o.price, false, primary),
-    ];
+      this.purchaseArea(o.price, locked, primary),
+    ].filter((e): e is HTMLElement => e !== null);
   }
 
   /** Purchases are single transactions: a double click inside the lock window is ignored. */

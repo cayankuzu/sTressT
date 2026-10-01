@@ -9,13 +9,13 @@ npm test        # unit tests only (vitest)
 
 | Suite | Covers |
 | --- | --- |
-| `src/data/catalog.test.ts` | Game data is internally consistent (every reference resolves, prices/tiers ordered, street finds valid, everything priced can be carried, the starter room is breakable with fists) |
+| `src/data/catalog.test.ts` | Game data is internally consistent (every reference resolves, prices/levels ordered, street finds valid, everything priced can be carried, at least four starter objects breakable with fists), every level has its tool and at least three objects, the last tool breaks everything and no object breaks one level below its own, price bands rise with the level |
 | `src/destruction/damage.test.ts` | Damage model (angle, concentration, thresholds, chain-reaction falloff, no NaN/Infinity) and stage rules (each stage exactly once, never backwards) |
 | `src/destruction/debrisRules.test.ts` | Major/minor classification within budget and world cap, the debris state machine (disposed is final), refracture limits and heavy pieces always breakable |
 | `src/destruction/geometry/geometry.test.ts` | Slicing keeps area and winding, cut points are bit-identical, islands, deterministic fracture for every pattern, bodies with many detail islands still split, chipping, hull tops and bases kept to four corners |
-| `src/economy/economy.test.ts` | Ledger idempotency, purchases and deliveries, tool pick-up, safety box, one-time street finds, old saves' storage delivered once, sessions, ledger pruning, refusals, no input mutation, invariants |
-| `src/economy/simulate.test.ts` | Economy pacing for bad / average / good players; nobody gets stuck |
-| `src/session/session.test.ts` | Exactly-once rewards, combo only across different objects, one clear bonus per session, one-hit and chain-reaction bonuses |
+| `src/economy/economy.test.ts` | Ledger idempotency, purchases and deliveries, the store selling only breakable levels (bench counts), first-break bonus once per kind and the collection bonus once, stage shares adding up to the value, better value per level, tool pick-up, safety box, one-time street finds, old saves' storage delivered once, sessions, ledger pruning, refusals, no input mutation, invariants |
+| `src/economy/simulate.test.ts` | Economy pacing with levels for bad / average / good players (every tool and the whole collection reachable); nobody gets stuck |
+| `src/session/session.test.ts` | Exactly-once rewards for all three stages (adding up to the value), first-break bonus once per kind, combo only across different objects, one clear bonus per session, one-hit and chain-reaction bonuses |
 | `src/destruction/geometry/fracture.bench.test.ts` | Fracture timings on real models; skipped unless `BENCH=1` |
 
 ## QA harness (dev builds only)
@@ -95,6 +95,8 @@ Results of the last full pass (Chromium, Windows 11, Intel UHD, dev and producti
 | Demo end | Last tool picked up from the bench → summary after 1.5 s; continue resumes; not shown again after load | Pass |
 | Playthrough | `qa.playthrough()` three times: every step passes, save/load identical, invariants hold, no errors | Pass |
 | Objects | `qa.objectAudit()` over all 40 objects: no errors, no piece outside the room or in the floor | Pass |
+| Levels | Fists on the level-3 chair: no damage, lock line on the health bar, "needs the Baseball Bat" note; kick and a dropped box do nothing at level 2, a kick works once the bat is owned; with the bat owned, fists say "press 3"; the store refuses locked objects; picking up the pan announces level 2 | Pass |
+| Rewards | Stage popups (DAMAGED, BROKEN, DESTROYED) merged per hit, FIRST TIME! once per kind, HUD goal and collection counter update | Pass |
 | Browsers | Firefox, Safari | **Not yet run** |
 | Hardware | A real low-end PC (2–4 cores, old iGPU) | **Not yet run**; approximated with `?q=low` and CPU throttling |
 

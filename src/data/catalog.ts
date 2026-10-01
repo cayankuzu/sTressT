@@ -39,6 +39,34 @@ export const STARTER_TOOL_ID = "fists";
 /** Tool ids in shop / quick-select order. */
 export const TOOL_IDS: readonly string[] = Object.keys(TOOLS).sort((a, b) => (TOOLS[a]?.tier ?? 0) - (TOOLS[b]?.tier ?? 0));
 
+/** Progression levels: each tool opens one, and the last one breaks everything. */
+export const MAX_TIER = 7;
+
+/** Whether a tool of level `toolTier` can damage `def` (indestructible props never break). */
+export function canBreak(toolTier: number, def: ObjectDefinition): boolean {
+  return def.capabilities.destructible && toolTier >= def.tier;
+}
+
+/** Highest level among these tools (fists = 1, unknown ids ignored). */
+export function bestTier(toolIds: Iterable<string>): number {
+  let best = 1;
+  for (const id of toolIds) best = Math.max(best, TOOLS[id]?.tier ?? 1);
+  return best;
+}
+
+/** The tool that opens `tier`. */
+export function toolForTier(tier: number): string {
+  return TOOL_IDS.find((id) => TOOLS[id]?.tier === tier) ?? TOOL_IDS[TOOL_IDS.length - 1] ?? STARTER_TOOL_ID;
+}
+
+/** Breakable objects that need exactly this level (what a tool of that level newly opens). */
+export function objectsOfTier(tier: number): string[] {
+  return Object.keys(OBJECTS).filter((id) => OBJECTS[id]?.capabilities.destructible && OBJECTS[id]?.tier === tier);
+}
+
+/** Every breakable object type: the collection to complete. */
+export const COLLECTIBLE_IDS: readonly string[] = Object.keys(OBJECTS).filter((id) => OBJECTS[id]?.capabilities.destructible);
+
 export function getTool(id: string): ToolDefinition {
   const tool = TOOLS[id];
   if (!tool) throw new Error(`Unknown tool "${id}"`);
@@ -87,6 +115,9 @@ export function validateCatalog(): string[] {
     if (!SOUNDS[tool.sound]) errors.push(`tool "${id}": unknown sound "${tool.sound}"`);
   }
   if (!TOOLS[STARTER_TOOL_ID] || TOOLS[STARTER_TOOL_ID]?.price !== 0) errors.push("starter tool must exist and be free");
+  const tiers = Object.values(TOOLS).map((tl) => tl.tier).sort((a, b) => a - b);
+  if (tiers.join() !== Array.from({ length: MAX_TIER }, (_, i) => i + 1).join()) errors.push(`tools must have levels 1..${MAX_TIER}, one each`);
+  if (TOOLS[STARTER_TOOL_ID]?.tier !== 1) errors.push("the starter tool must be level 1");
 
   for (const [id, def] of Object.entries(OBJECTS)) {
     if (!MODELS[def.model]) errors.push(`object "${id}": unknown model "${def.model}"`);
@@ -94,6 +125,7 @@ export function validateCatalog(): string[] {
     for (const zone of def.zones ?? []) if (!materialSet.has(zone.material)) errors.push(`object "${id}": unknown zone material`);
     for (const key of ["mass", "health"] as const) if (!isPositive(def[key])) errors.push(`object "${id}": ${key} must be > 0`);
     for (const key of ["value", "price", "stress"] as const) if (!isNonNegative(def[key])) errors.push(`object "${id}": ${key} must be >= 0`);
+    if (!Number.isInteger(def.tier) || def.tier < 1 || def.tier > MAX_TIER) errors.push(`object "${id}": tier must be 1..${MAX_TIER}`);
   }
 
   const seen = new Set<string>();

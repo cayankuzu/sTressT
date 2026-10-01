@@ -2,243 +2,243 @@
   "tea_cup": {
     "name": "Tea Cup", "description": "Thin porcelain. Barely an inconvenience.", "model": "tea_cup",
     "category": "fragile", "material": "ceramic", "structure": "simple",
-    "mass": 0.25, "health": 40, "value": 26, "price": 25, "stress": 2,
+    "mass": 0.25, "health": 40, "value": 26, "price": 25, "tier": 1, "stress": 2,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "saucer": {
     "name": "Saucer", "description": "Small, round, satisfying.", "model": "saucer",
     "category": "fragile", "material": "ceramic", "structure": "simple",
-    "mass": 0.2, "health": 30, "value": 21, "price": 20, "stress": 1,
+    "mass": 0.2, "health": 30, "value": 21, "price": 20, "tier": 1, "stress": 1,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "dinner_plate": {
     "name": "Dinner Plate", "description": "Made for throwing at walls.", "model": "dinner_plate",
     "category": "fragile", "material": "ceramic", "structure": "simple",
-    "mass": 0.45, "health": 40, "value": 32, "price": 30, "stress": 2,
+    "mass": 0.45, "health": 40, "value": 32, "price": 30, "tier": 1, "stress": 2,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "teapot": {
     "name": "Teapot", "description": "Short and stout. Not for long.", "model": "teapot",
     "category": "fragile", "material": "ceramic", "structure": "simple",
-    "mass": 0.9, "health": 70, "value": 95, "price": 90, "stress": 3,
+    "mass": 0.9, "health": 70, "value": 186, "price": 160, "tier": 4, "stress": 3,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "ceramic_vase_01": {
     "name": "Ceramic Vase", "description": "Glazed stoneware with a wide belly.", "model": "ceramic_vase_01",
     "category": "fragile", "material": "ceramic", "structure": "simple",
-    "mass": 1.4, "health": 90, "value": 63, "price": 60, "stress": 4,
+    "mass": 1.4, "health": 90, "value": 58, "price": 55, "tier": 1, "stress": 4,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "ceramic_vase_02": {
     "name": "Round Vase", "description": "Squat and heavy for its size.", "model": "ceramic_vase_02",
     "category": "fragile", "material": "ceramic", "structure": "simple",
-    "mass": 1.5, "health": 95, "value": 74, "price": 70, "stress": 4,
+    "mass": 1.5, "health": 95, "value": 86, "price": 80, "tier": 2, "stress": 4,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "ceramic_vase_03": {
     "name": "Tall Vase", "description": "Tall and slender. Topples beautifully.", "model": "ceramic_vase_03",
     "category": "fragile", "material": "ceramic", "structure": "simple",
-    "mass": 1.2, "health": 85, "value": 84, "price": 80, "stress": 4,
+    "mass": 1.2, "health": 85, "value": 146, "price": 130, "tier": 3, "stress": 4,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "ceramic_vase_04": {
     "name": "Pitcher Vase", "description": "Rustic glaze, thick walls.", "model": "ceramic_vase_04",
     "category": "fragile", "material": "ceramic", "structure": "simple",
-    "mass": 1.3, "health": 90, "value": 79, "price": 75, "stress": 4,
+    "mass": 1.3, "health": 90, "value": 134, "price": 120, "tier": 3, "stress": 4,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "antique_vase": {
     "name": "Antique Vase", "description": "Irreplaceable. Allegedly.", "model": "antique_vase",
     "category": "fragile", "material": "ceramic", "structure": "simple",
-    "mass": 2.4, "health": 110, "value": 420, "price": 400, "stress": 8,
+    "mass": 2.4, "health": 110, "value": 441, "price": 380, "tier": 4, "stress": 8,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "clay_pot": {
     "name": "Clay Pot", "description": "Terracotta. Crumbles into chunky shards.", "model": "clay_pot",
     "category": "fragile", "material": "ceramic", "structure": "simple",
-    "mass": 1.8, "health": 80, "value": 53, "price": 50, "stress": 3,
+    "mass": 1.8, "health": 80, "value": 65, "price": 60, "tier": 2, "stress": 3,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "ceramic_jug": {
     "name": "Ceramic Jug", "description": "Has a handle. Good for throwing.", "model": "ceramic_jug",
     "category": "fragile", "material": "ceramic", "structure": "simple",
-    "mass": 1.1, "health": 75, "value": 63, "price": 60, "stress": 3,
+    "mass": 1.1, "health": 75, "value": 70, "price": 65, "tier": 2, "stress": 3,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "wine_bottle": {
     "name": "Wine Bottle", "description": "Empty. Probably.", "model": "wine_bottle",
     "category": "fragile", "material": "glass", "structure": "simple",
-    "mass": 1.3, "health": 35, "value": 42, "price": 40, "stress": 3,
+    "mass": 1.3, "health": 35, "value": 42, "price": 40, "tier": 1, "stress": 3,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "champagne_bottle": {
     "name": "Champagne Bottle", "description": "Thick green glass. Celebrate.", "model": "champagne_bottle",
     "category": "fragile", "material": "glass", "structure": "simple",
-    "mass": 1.6, "health": 45, "value": 58, "price": 55, "stress": 3,
+    "mass": 1.6, "health": 45, "value": 59, "price": 55, "tier": 2, "stress": 3,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "picture_frame": {
     "name": "Picture Frame", "description": "Glass front, wooden back.", "model": "picture_frame",
     "category": "fragile", "material": "wood", "structure": "simple",
-    "mass": 0.6, "health": 35, "value": 63, "price": 60, "stress": 2,
+    "mass": 0.6, "health": 35, "value": 76, "price": 70, "tier": 2, "stress": 2,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "mirror": {
     "name": "Ornate Mirror", "description": "Seven years of bad luck, zero regrets.", "model": "mirror",
     "category": "fragile", "material": "wood", "structure": "simple",
     "zones": [{ "material": "glass", "min": [-0.215, 0.03, -0.03], "max": [0.215, 0.71, 0.03] }],
-    "mass": 5, "health": 90, "value": 273, "price": 260, "stress": 7, "restPose": "faceUp",
+    "mass": 5, "health": 90, "value": 348, "price": 300, "tier": 4, "stress": 7, "restPose": "faceUp",
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "cardboard_box": {
     "name": "Cardboard Box", "description": "Crushes, tears, folds.", "model": "cardboard_box",
     "category": "furniture", "material": "cardboard", "structure": "simple",
-    "mass": 0.8, "health": 95, "value": 21, "price": 20, "stress": 2,
+    "mass": 0.8, "health": 95, "value": 21, "price": 20, "tier": 1, "stress": 2,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "crt_tv": {
     "name": "CRT Television", "description": "Wood casing, glass tube, pure nostalgia.", "model": "crt_tv",
     "category": "electronics", "material": "electronic", "structure": "simple",
     "zones": [{ "material": "glass", "min": [-0.29, 0.06, 0.17], "max": [0.15, 0.37, 0.26] }],
-    "mass": 16, "health": 450, "value": 441, "price": 420, "stress": 12,
+    "mass": 16, "health": 450, "value": 1040, "price": 800, "tier": 7, "stress": 12,
     "capabilities": { "grabbable": true, "throwable": false, "standable": true, "destructible": true }
   },
   "small_tv": {
     "name": "Portable TV", "description": "Tiny screen, big crunch.", "model": "small_tv",
     "category": "electronics", "material": "electronic", "structure": "simple",
-    "mass": 7, "health": 240, "value": 231, "price": 220, "stress": 8,
+    "mass": 7, "health": 240, "value": 408, "price": 340, "tier": 5, "stress": 8,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "laptop": {
     "name": "Classic Laptop", "description": "Thick as a brick, heavy as one too.", "model": "laptop",
     "category": "electronics", "material": "electronic", "structure": "assembled",
-    "mass": 2.2, "health": 320, "value": 399, "price": 380, "stress": 9, "scale": 0.54,
+    "mass": 2.2, "health": 320, "value": 528, "price": 440, "tier": 5, "stress": 9, "scale": 0.54,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "boombox": {
     "name": "Boombox", "description": "Plastic shell, metal grilles.", "model": "boombox",
     "category": "electronics", "material": "electronic", "structure": "simple",
-    "mass": 2.5, "health": 260, "value": 315, "price": 300, "stress": 8, "scale": 0.7,
+    "mass": 2.5, "health": 260, "value": 456, "price": 380, "tier": 5, "stress": 8, "scale": 0.7,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "microwave": {
     "name": "Vintage Microwave", "description": "Metal box with a glass door.", "model": "microwave",
     "category": "electronics", "material": "metal", "structure": "simple",
-    "mass": 12, "health": 480, "value": 473, "price": 450, "stress": 11, "scale": 0.47,
+    "mass": 12, "health": 480, "value": 775, "price": 620, "tier": 6, "stress": 11, "scale": 0.47,
     "capabilities": { "grabbable": true, "throwable": false, "standable": true, "destructible": true }
   },
   "alarm_clock": {
     "name": "Alarm Clock", "description": "It woke you up one too many times.", "model": "alarm_clock",
     "category": "electronics", "material": "metal", "structure": "simple",
-    "mass": 0.5, "health": 60, "value": 95, "price": 90, "stress": 4,
+    "mass": 0.5, "health": 60, "value": 264, "price": 220, "tier": 5, "stress": 4,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "desk_lamp": {
     "name": "Desk Lamp", "description": "Iron pipe fittings on a bolted base, bare bulb. The pipes bend, the bulb pops.", "model": "desk_lamp",
     "category": "electronics", "material": "metal", "structure": "assembled",
-    "mass": 2.8, "health": 150, "value": 116, "price": 110, "stress": 5,
+    "mass": 2.8, "health": 150, "value": 312, "price": 260, "tier": 5, "stress": 5,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "wooden_chair": {
     "name": "Wooden Chair", "description": "Painted pine. Legs snap at the joints.", "model": "wooden_chair",
     "category": "furniture", "material": "wood", "structure": "assembled",
-    "mass": 4.5, "health": 260, "value": 147, "price": 140, "stress": 7,
+    "mass": 4.5, "health": 260, "value": 168, "price": 150, "tier": 3, "stress": 7,
     "capabilities": { "grabbable": true, "throwable": true, "standable": true, "destructible": true }
   },
   "plastic_chair": {
     "name": "Plastic Chair", "description": "Monobloc. Flexes, then cracks.", "model": "plastic_chair",
     "category": "furniture", "material": "plastic", "structure": "simple",
-    "mass": 2.5, "health": 200, "value": 105, "price": 100, "stress": 6,
+    "mass": 2.5, "health": 200, "value": 123, "price": 110, "tier": 3, "stress": 6,
     "capabilities": { "grabbable": true, "throwable": true, "standable": true, "destructible": true }
   },
   "school_chair": {
     "name": "School Chair", "description": "Steel frame, plywood seat.", "model": "school_chair",
     "category": "furniture", "material": "wood", "structure": "assembled",
-    "mass": 6, "health": 320, "value": 210, "price": 200, "stress": 8,
+    "mass": 6, "health": 320, "value": 500, "price": 400, "tier": 6, "stress": 8,
     "capabilities": { "grabbable": true, "throwable": true, "standable": true, "destructible": true }
   },
   "wooden_stool": {
     "name": "Wooden Stool", "description": "Three legs of opportunity.", "model": "wooden_stool",
     "category": "furniture", "material": "wood", "structure": "assembled",
-    "mass": 2.5, "health": 180, "value": 95, "price": 90, "stress": 5,
+    "mass": 2.5, "health": 180, "value": 112, "price": 100, "tier": 3, "stress": 5,
     "capabilities": { "grabbable": true, "throwable": true, "standable": true, "destructible": true }
   },
   "side_table": {
     "name": "Side Table", "description": "Holds things up. For now.", "model": "side_table",
     "category": "furniture", "material": "wood", "structure": "assembled",
-    "mass": 6, "health": 300, "value": 158, "price": 150, "stress": 7,
+    "mass": 6, "health": 300, "value": 190, "price": 170, "tier": 3, "stress": 7,
     "capabilities": { "grabbable": true, "throwable": true, "standable": true, "destructible": true }
   },
   "wooden_table": {
     "name": "Wooden Table", "description": "Solid top, four legs. Collapses when enough give way.", "model": "wooden_table",
     "category": "furniture", "material": "wood", "structure": "assembled",
-    "mass": 14, "health": 800, "value": 368, "price": 350, "stress": 12,
+    "mass": 14, "health": 800, "value": 700, "price": 560, "tier": 6, "stress": 12,
     "capabilities": { "grabbable": true, "throwable": false, "standable": true, "destructible": true }
   },
   "nightstand": {
     "name": "Nightstand", "description": "One drawer, many splinters.", "model": "nightstand",
     "category": "furniture", "material": "wood", "structure": "assembled",
-    "mass": 9, "health": 380, "value": 179, "price": 170, "stress": 7,
+    "mass": 9, "health": 380, "value": 550, "price": 440, "tier": 6, "stress": 7,
     "capabilities": { "grabbable": true, "throwable": true, "standable": true, "destructible": true }
   },
   "wooden_cabinet": {
     "name": "Wooden Cabinet", "description": "Doors, drawers and a lot of pine.", "model": "wooden_cabinet",
     "category": "furniture", "material": "wood", "structure": "assembled",
-    "mass": 32, "health": 1100, "value": 546, "price": 520, "stress": 15,
+    "mass": 32, "health": 1100, "value": 1235, "price": 950, "tier": 7, "stress": 15,
     "capabilities": { "grabbable": true, "throwable": false, "standable": true, "destructible": true }
   },
   "wooden_crate": {
     "name": "Wooden Crate", "description": "Slatted crate with a lid.", "model": "wooden_crate",
     "category": "furniture", "material": "wood", "structure": "assembled",
-    "mass": 8, "health": 340, "value": 168, "price": 160, "stress": 7,
+    "mass": 8, "health": 340, "value": 525, "price": 420, "tier": 6, "stress": 7,
     "capabilities": { "grabbable": true, "throwable": true, "standable": true, "destructible": true }
   },
   "wet_floor_sign": {
     "name": "Wet Floor Sign", "description": "Caution: about to be broken.", "model": "wet_floor_sign",
     "category": "toys", "material": "plastic", "structure": "simple",
-    "mass": 0.9, "health": 60, "value": 42, "price": 40, "stress": 2,
+    "mass": 0.9, "health": 60, "value": 49, "price": 45, "tier": 2, "stress": 2,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "garden_gnome": {
     "name": "Garden Gnome", "description": "He knows what you did.", "model": "garden_gnome",
     "category": "statues", "material": "ceramic", "structure": "simple",
-    "mass": 4, "health": 150, "value": 189, "price": 180, "stress": 6,
+    "mass": 4, "health": 150, "value": 255, "price": 220, "tier": 4, "stress": 6,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "cat_statue": {
     "name": "Concrete Cat", "description": "Cast concrete. Chips before it breaks.", "model": "cat_statue",
     "category": "statues", "material": "stone", "structure": "simple",
-    "mass": 3.5, "health": 220, "value": 231, "price": 220, "stress": 6,
+    "mass": 3.5, "health": 220, "value": 302, "price": 260, "tier": 4, "stress": 6,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": true }
   },
   "marble_bust": {
     "name": "Marble Bust", "description": "Solid marble. Needs real force.", "model": "marble_bust",
     "category": "statues", "material": "stone", "structure": "simple",
-    "mass": 14, "health": 600, "value": 630, "price": 600, "stress": 14,
+    "mass": 14, "health": 600, "value": 1560, "price": 1200, "tier": 7, "stress": 14,
     "capabilities": { "grabbable": true, "throwable": false, "standable": false, "destructible": true }
   },
   "metal_barrel": {
     "name": "Steel Drum", "description": "Won't break. Will dent, roll and flatten things.", "model": "metal_barrel",
     "category": "toys", "material": "metal", "structure": "simple",
-    "mass": 18, "health": 99999, "value": 0, "price": 120, "stress": 0,
+    "mass": 18, "health": 99999, "value": 0, "price": 120, "tier": 1, "stress": 0,
     "capabilities": { "grabbable": true, "throwable": false, "standable": true, "destructible": false }
   },
   "old_tyre": {
     "name": "Old Tyre", "description": "Bouncy, rolly, indestructible.", "model": "old_tyre",
     "category": "toys", "material": "rubber", "structure": "simple",
-    "mass": 8, "health": 99999, "value": 0, "price": 80, "stress": 0,
+    "mass": 8, "health": 99999, "value": 0, "price": 80, "tier": 1, "stress": 0,
     "capabilities": { "grabbable": true, "throwable": true, "standable": true, "destructible": false }
   },
   "football": {
     "name": "Football", "description": "Kick it into the crockery.", "model": "football",
     "category": "toys", "material": "rubber", "structure": "simple",
-    "mass": 0.45, "health": 99999, "value": 0, "price": 40, "stress": 0,
+    "mass": 0.45, "health": 99999, "value": 0, "price": 40, "tier": 1, "stress": 0,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": false }
   },
   "rubber_duck": {
     "name": "Rubber Duck", "description": "Emotional support duck.", "model": "rubber_duck",
     "category": "toys", "material": "rubber", "structure": "simple",
-    "mass": 0.3, "health": 99999, "value": 0, "price": 30, "stress": 0,
+    "mass": 0.3, "health": 99999, "value": 0, "price": 30, "tier": 1, "stress": 0,
     "capabilities": { "grabbable": true, "throwable": true, "standable": false, "destructible": false }
   }
 }

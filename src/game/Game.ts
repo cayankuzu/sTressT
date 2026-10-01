@@ -6,7 +6,7 @@ import { detectQuality, QUALITY, type QualitySettings } from "../config/quality"
 import type { Assets } from "../core/assets";
 import { EventBus } from "../core/events";
 import type { Action, Input } from "../core/input";
-import { getObject, getTool, MATERIALS, OBJECTS, TOOL_IDS } from "../data/catalog";
+import { bestTier, canBreak, COLLECTIBLE_IDS, getObject, getTool, MATERIALS, OBJECTS, objectsOfTier, TOOL_IDS, TOOLS, toolForTier } from "../data/catalog";
 import type { MaterialType, ObjectDefinition, ObjectOrigin } from "../data/types";
 import type { Destructible } from "../destruction/Destructible";
 import type { Fragment } from "../destruction/Debris";
@@ -27,7 +27,7 @@ import { MAX_PROFILES, type ProfileStore, randomId } from "../save/profiles";
 import type { SaveManager } from "../save/SaveManager";
 import { type Mode, newSave, type SaveData, SCHEMA_VERSION, migrateLegacy } from "../save/schema";
 import type { Settings } from "../save/settings";
-import { type Payout, Session } from "../session/Session";
+import { type Payout, type PayoutLabel, Session } from "../session/Session";
 import { createDebugOverlay, type DebugOverlay } from "../ui/debugOverlay";
 import { Hud, type ModeBarItem } from "../ui/hud";
 import { formatCredits, formatDate, formatDuration, objectName, setLanguage, t, type TextKey, toolName } from "../ui/i18n";
@@ -67,6 +67,10 @@ const DUST: Record<MaterialType, Color> = Object.fromEntries(
 const DEMO_END_DELAY = 1.5;
 /** Pieces that land in the container within this many seconds of each other share one popup. */
 const CLEANUP_POPUP_GATHER = 0.3;
+/** Seconds before the "too weak for it" note can repeat for the same object kind. */
+const BLOCKED_NOTE_SECONDS = 2.5;
+/** When one hit crosses several stages, the popup names the most remarkable one. */
+const LABEL_RANK: Record<PayoutLabel, number> = { "": 0, damaged: 1, broken: 2, destroyed: 3, chain: 4, one_hit: 5, clear: 6, cleanup: 6, first: 7 };
 const DROP_BOX = new Box3();
 const OBJECT_BOX = new Box3();
 
@@ -139,6 +143,9 @@ export class Game {
   private cleanup = { disposed: 0, earned: 0, announced: false };
   /** Cleanup pay not shown yet: pieces landing in the container together make one popup. */
   private readonly cleanupPopup = { amount: 0, timer: 0, point: new Vector3() };
+  /** Payouts of this frame by object: a hit that crosses several stages shows one sum. */
+  private readonly pendingPayouts = new Map<string, Payout>();
+  private blockedNote = { kind: "", timer: 0 };
   private breakEndTimer = -1;
   private baseFov: number = GAME.player.fov;
   private readonly tmp = new Vector3();
@@ -209,7 +216,8 @@ export class Game {
     this.hud.setVisible(false);
     this.session = new Session({
       reward: (key, amount) => this.progress.reward(key, amount),
-      payout: (p) => this.showPayout(p),
+      payout: (p) => this.queuePayout(p),
+      firstBreak: (id) => this.onFirstBreak(id),
       stress: (value) => this.hud.setStress(this.mode === "break" ? value : null),
       combo: (count, multiplier) => this.hud.setCombo(count, multiplier),
       cleared: () => {
@@ -222,6 +230,12 @@ export class Game {
     });
     this.destruction.onStage = (e) => this.onStage(e);
     this.destruction.onFeedback = (f) => {
+      if (f.blocked && f.source === "tool") {
+        // Too weak: a dull knock and a few sparks, no dust and no crack.
+        this.audio.impact("metal", Math.min(30, f.energy * 0.4), f.point, false);
+        this.particles.emit("sparks", f.point, f.normal ?? UP, DUST.metal, 4, 40);
+        return;
+      }
       const toolSound = f.source !== "tool" ? undefined : f.toolId ? getTool(f.toolId).sound : "impactPunch_heavy";
       this.audio.impact(f.material, f.energy, f.point, f.broke, toolSound);
       this.emitImpactParticles(f.material, f.energy, f.point, f.normal ?? UP, f.source, f.broke, f.toolId);
@@ -239,6 +253,8 @@ export class Game {
     this.destruction.onLost = () => this.updateModeHud();
     this.destruction.onObjectLost = (obj) => this.recoverObject(obj);
     this.destruction.onObjectGone = () => this.saves.request();
+    this.destruction.breakTier = () => bestTier(this.progress.state.ownedTools);
+    this.destruction.onBlocked = (obj) => this.onBlockedHit(obj);
     this.destruction.onObjectInBin = (obj) => this.hud.showToast(t("toast.binIntact", { name: objectName(obj.definitionId) }), "info", 3);
     this.events.on("ATTACK_STARTED", () => this.audio.swing(this.tools.tool.effectiveMass, this.tools.tool.windup + this.tools.tool.active));
     this.events.on("REWARD_GRANTED", ({ amount }) => this.audio.reward(amount >= 30));
@@ -617,6 +633,7 @@ export class Game {
         [t("demo.disposed"), String(s.debrisDisposed)],
         [t("demo.combo"), `×${s.highestCombo}`],
         [t("demo.thrown"), String(s.objectsThrown)],
+        [t("demo.collection"), `${this.progress.state.collection.length} / ${COLLECTIBLE_IDS.length}`],
       ],
       { onContinue: () => void this.resume(), onMainMenu: () => void this.quitToMenu() },
     );
@@ -712,7 +729,9 @@ export class Game {
   /** Never stuck: no credits for the cheapest item and nothing left anywhere to break. */
   private safetyAvailable(): boolean {
     if (this.progress.state.credits >= cheapestObjectPrice() || this.deliveriesInFlight > 0) return false;
-    for (const obj of this.destruction.all()) if (obj.alive && obj.template.def.capabilities.destructible) return false;
+    // Something the player's tools cannot break yet does not count: it cannot earn anything.
+    const tier = this.ownedTier();
+    for (const obj of this.destruction.all()) if (obj.alive && canBreak(tier, obj.template.def)) return false;
     return true;
   }
 
@@ -822,7 +841,12 @@ export class Game {
       const front = STREET.northFacadeZ - STREET.facadeThickness;
       if (this.player.feet.z > front - 0.45 && Math.abs(this.player.feet.x - (ROOM.origin[0] + ROOM_DOOR.x)) < ROOM_DOOR.width) return t("mode.blocked.doorway");
       // Pieces too heavy to carry can only be made smaller here, so they count as breakable.
-      if (!this.breakablesInRoom().length && !this.heavyPieces().length) return t("mode.blocked.empty");
+      if (!this.breakablesInRoom().length && !this.heavyPieces().length) {
+        const locked = this.lockedInRoom();
+        if (locked.length === 0) return t("mode.blocked.empty");
+        const need = Math.min(...locked.map((o) => o.template.def.tier));
+        return t("mode.blocked.locked", { tool: toolName(toolForTier(need)) });
+      }
     }
     return null;
   }
@@ -852,10 +876,12 @@ export class Game {
     this.session.begin(sessionId, this.breakablesInRoom().map((o) => o.template.def));
     this.destruction.damageEnabled = true;
     this.hud.showToast(t("toast.breakStart"), "warn", 1.8);
+    const locked = this.lockedInRoom();
+    const lockedNote = locked.length > 0 ? t("hint.lockedInRoom", { n: locked.length, tool: toolName(toolForTier(Math.min(...locked.map((o) => o.template.def.tier)))) }) : "";
     if (!this.progress.flag("tut_break")) {
       this.progress.setFlag("tut_break");
-      this.hud.hint(t("tut.break"), 7);
-    }
+      this.hud.hint(lockedNote ? `${t("tut.break")} ${lockedNote}` : t("tut.break"), 9);
+    } else if (lockedNote) this.hud.hint(lockedNote, 6);
   }
 
   private endBreak(): void {
@@ -872,9 +898,27 @@ export class Game {
     if (pieces > 0 && !this.progress.flag("tut_cleanup_done")) this.hud.hint(t("tut.cleanup"), 12);
   }
 
+  /** Highest level the player's tools reach. */
+  private ownedTier(): number {
+    return bestTier(this.progress.state.ownedTools);
+  }
+
+  /** Objects in the room the player's tools can break. */
   private breakablesInRoom(): Destructible[] {
+    const tier = this.ownedTier();
     const list: Destructible[] = [];
-    for (const obj of this.destruction.all()) if (obj.alive && obj.template.def.capabilities.destructible && isInRoom(obj.currPos.x, obj.currPos.z)) list.push(obj);
+    for (const obj of this.destruction.all()) if (obj.alive && canBreak(tier, obj.template.def) && isInRoom(obj.currPos.x, obj.currPos.z)) list.push(obj);
+    return list;
+  }
+
+  /** Objects in the room that need a better tool than the player owns. */
+  private lockedInRoom(): Destructible[] {
+    const tier = this.ownedTier();
+    const list: Destructible[] = [];
+    for (const obj of this.destruction.all()) {
+      const def = obj.template.def;
+      if (obj.alive && def.capabilities.destructible && !canBreak(tier, def) && isInRoom(obj.currPos.x, obj.currPos.z)) list.push(obj);
+    }
     return list;
   }
 
@@ -971,6 +1015,7 @@ export class Game {
       generation: e.impact.generation,
       point: e.impact.point,
       toolName: e.impact.toolId ? toolName(e.impact.toolId) : undefined,
+      definitionId: e.obj.definitionId,
     });
     if (e.stage !== "damaged") this.saves.request();
   }
@@ -1080,7 +1125,9 @@ export class Game {
       );
       if (this.state === "playing") {
         this.session.update(frameSeconds);
+        this.flushPayouts();
         this.updateCleanupPopup(frameSeconds);
+        this.blockedNote.timer -= frameSeconds;
         if (this.breakEndTimer > 0) {
           this.breakEndTimer -= frameSeconds;
           if (this.breakEndTimer <= 0 && this.mode === "break") this.setMode("cleanup");
@@ -1110,6 +1157,7 @@ export class Game {
     if (this.state === "playing") {
       this.updatePrompts();
       this.updateTargeting();
+      this.updateGoal();
       this.updateFootsteps();
       this.saves.tick(frameSeconds);
     }
@@ -1232,12 +1280,19 @@ export class Game {
     const hit = world.castRay(new RAPIER.Ray(this.camera.position, this.aimDir), GAME.interaction.reach, true, RAPIER.QueryFilterFlags.EXCLUDE_SENSORS, AIM_FILTER, this.player.collider);
     const delivery = hit ? this.bench.deliveryAt(hit.collider.handle) : null;
     if (delivery) {
+      const before = this.ownedTier();
       const r = this.progress.pickUpTool(delivery.id);
       if (r.ok) {
         void this.bench.show(this.progress.state.toolDeliveries);
         void this.equip(r.toolId);
         this.audio.pickup();
         this.hud.showToast(t("toast.toolPicked", { name: toolName(r.toolId) }), "good");
+        const tier = this.ownedTier();
+        if (tier > before) {
+          // A new level: everything of it is now breakable and on sale.
+          this.audio.roomCleared();
+          this.hud.summary(t("summary.levelUp", { n: tier }), t("summary.levelUpLine", { tool: toolName(r.toolId), n: objectsOfTier(tier).length }), 5);
+        }
         // The last tool ends the demo (once): a moment to enjoy it, then the summary.
         if (TOOL_IDS.every((id) => this.progress.state.ownedTools.includes(id)) && !this.progress.flag("demo_complete")) {
           this.progress.setFlag("demo_complete");
@@ -1347,7 +1402,7 @@ export class Game {
         return;
       }
       if (a.hovered) {
-        this.hud.setPrompt("LMB", `${objectName(a.hovered.definitionId).toLocaleUpperCase()} · ${t("prompt.arrangeHover")}`);
+        this.hud.setPrompt("LMB", `${objectName(a.hovered.definitionId).toLocaleUpperCase()} · ${t("hud.level", { n: a.hovered.template.def.tier })} · ${t("prompt.arrangeHover")}`);
         return;
       }
     }
@@ -1405,13 +1460,82 @@ export class Game {
     }
     this.tmp2.copy(shown.root.position).add(this.tmp.set(0, shown.template.size[1] + 0.12, 0));
     const screen = this.toScreen(this.tmp2);
-    this.hud.setHealth(screen ? { name: objectName(shown.definitionId), ratio: shown.healthRatio, x: screen.x, y: screen.y } : null);
+    const def = shown.template.def;
+    const lock = canBreak(this.tools.tool.tier, def) ? null : t("hud.lock", { tool: toolName(toolForTier(def.tier)).toLocaleUpperCase() });
+    this.hud.setHealth(screen ? { name: `${objectName(shown.definitionId)} · ${t("hud.level", { n: def.tier })}`, ratio: shown.healthRatio, x: screen.x, y: screen.y, lock } : null);
+  }
+
+  /** The next tool to save up for, then the collection: always one clear thing to play for. */
+  private updateGoal(): void {
+    const s = this.progress.state;
+    const collection = t("hud.collection", { n: s.collection.length, max: COLLECTIBLE_IDS.length });
+    const next = TOOL_IDS.find((id) => !s.ownedTools.includes(id));
+    const tool = next ? TOOLS[next] : undefined;
+    if (next && tool) {
+      const waiting = s.toolDeliveries.some((d) => d.toolId === next);
+      const opens = t("hud.goalOpens", { n: tool.tier, k: objectsOfTier(tool.tier).length });
+      if (waiting) this.hud.setGoal({ title: toolName(next), detail: t("hud.goalBench"), sub: opens, ratio: 1, collection, ready: true });
+      else {
+        const ready = s.credits >= tool.price;
+        const detail = ready ? t("hud.goalAfford") : `${formatCredits(s.credits)} / ${formatCredits(tool.price)}`;
+        this.hud.setGoal({ title: toolName(next), detail, sub: opens, ratio: s.credits / tool.price, collection, ready });
+      }
+      return;
+    }
+    const left = COLLECTIBLE_IDS.length - s.collection.length;
+    if (left > 0) this.hud.setGoal({ title: t("hud.goalCollection"), detail: t("hud.goalCollectionLeft", { n: left }), sub: "", ratio: s.collection.length / COLLECTIBLE_IDS.length, collection, ready: false });
+    else this.hud.setGoal({ title: t("hud.goalDone"), detail: "", sub: "", ratio: 1, collection, ready: true });
   }
 
   private toScreen(world: Vector3): { x: number; y: number } | null {
     const v = world.clone().project(this.camera);
     if (v.z > 1 || v.z < -1 || Math.abs(v.x) > 1.1 || Math.abs(v.y) > 1.1) return null;
     return { x: ((v.x + 1) / 2) * window.innerWidth, y: ((1 - v.y) / 2) * window.innerHeight };
+  }
+
+  /** Collects this frame's payouts by object; `flushPayouts` shows one popup each. */
+  private queuePayout(p: Payout): void {
+    if (!p.key) {
+      this.showPayout(p);
+      return;
+    }
+    const prev = this.pendingPayouts.get(p.key);
+    if (!prev) {
+      this.pendingPayouts.set(p.key, { ...p });
+      return;
+    }
+    prev.amount += p.amount;
+    if (LABEL_RANK[p.label] > LABEL_RANK[prev.label]) prev.label = p.label;
+  }
+
+  private flushPayouts(): void {
+    if (this.pendingPayouts.size === 0) return;
+    for (const p of this.pendingPayouts.values()) this.showPayout(p);
+    this.pendingPayouts.clear();
+  }
+
+  /** A kind of object destroyed for the first time joins the collection. */
+  private onFirstBreak(definitionId: string): number {
+    const r = this.progress.collect(definitionId);
+    if (!r.ok) return 0;
+    if (r.complete) {
+      this.audio.roomCleared();
+      this.hud.summary(t("summary.collection"), t("summary.collectionLine", { n: COLLECTIBLE_IDS.length, credits: formatCredits(r.bonus) }), 7);
+    }
+    return r.amount;
+  }
+
+  /** A swing that cannot hurt the object: say which tool it needs (or which owned one to take). */
+  private onBlockedHit(obj: Destructible): void {
+    const def = obj.template.def;
+    const kind = `${obj.definitionId}:${this.tools.toolId}`;
+    if (this.blockedNote.kind === kind && this.blockedNote.timer > 0) return;
+    this.blockedNote = { kind, timer: BLOCKED_NOTE_SECONDS };
+    const owned = this.ownedToolIds();
+    const usable = owned.find((id) => canBreak(TOOLS[id]?.tier ?? 1, def));
+    const name = objectName(obj.definitionId);
+    if (usable) this.hud.showToast(t("toast.lockedSwitch", { name, tool: toolName(usable), key: owned.indexOf(usable) + 1 }), "warn", 2.4);
+    else this.hud.showToast(t("toast.locked", { name, tool: toolName(toolForTier(def.tier)), n: def.tier }), "warn", 2.6);
   }
 
   private showPayout(p: Payout): void {

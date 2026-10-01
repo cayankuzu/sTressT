@@ -14,12 +14,17 @@ export type SessionStats = {
   toolsUsed: Set<string>;
 };
 
-export type Payout = { amount: number; label: "" | "one_hit" | "chain" | "clear" | "cleanup"; name: string; point?: [number, number, number] };
+export type PayoutLabel = "" | "damaged" | "broken" | "destroyed" | "one_hit" | "chain" | "clear" | "cleanup" | "first";
+
+/** `key` groups the payouts of one object in one moment (a single hit can cross several stages). */
+export type Payout = { amount: number; label: PayoutLabel; name: string; point?: [number, number, number]; key?: string };
 
 export type SessionHooks = {
   /** Pays through the economy's idempotent ledger; false = this key was already paid. */
   reward(key: string, amount: number): boolean;
   payout(p: Payout): void;
+  /** First destruction of this kind of object: credits paid for the collection (0 = had it already). */
+  firstBreak(definitionId: string): number;
   stress(value: number): void;
   combo(count: number, multiplier: number): void;
   cleared(bonus: number): void;
@@ -110,14 +115,20 @@ export class Session {
   }
 
   /**
-   * An object crossed a destruction stage. `oneHit` = intact to destroyed in one impact,
-   * `generation` > 0 = destroyed by a chain reaction (thrown object, flying debris, collapse).
+   * An object crossed a destruction stage; each one pays (damaged, broken, destroyed). `oneHit` =
+   * intact to destroyed in one impact, `generation` > 0 = destroyed by a chain reaction (thrown
+   * object, flying debris, collapse). `definitionId` lets a first destruction join the collection.
    */
-  onStage(instanceId: string, def: ObjectDefinition, stage: "damaged" | "broken" | "destroyed", info: { oneHit: boolean; generation: number; point?: [number, number, number]; toolName?: string }): void {
-    if (!this.active || stage === "damaged" || !def.capabilities.destructible) return;
+  onStage(
+    instanceId: string,
+    def: ObjectDefinition,
+    stage: "damaged" | "broken" | "destroyed",
+    info: { oneHit: boolean; generation: number; point?: [number, number, number]; toolName?: string; definitionId?: string },
+  ): void {
+    if (!this.active || !def.capabilities.destructible) return;
     if (info.toolName) this.stats.toolsUsed.add(info.toolName);
     let amount = rewardWithCombo(stageReward(def, stage), this.combo + (this.comboObjects.has(instanceId) ? 0 : 1));
-    let label: Payout["label"] = "";
+    let label: PayoutLabel = stage;
     if (stage === "destroyed" && def.value >= 5) {
       if (info.oneHit) {
         amount += Math.max(2, Math.round(def.value * 0.2));
@@ -136,11 +147,20 @@ export class Session {
         this.stats.largestValue = def.value;
         this.stats.largestDestroyed = def.name;
       }
-    } else this.stats.objectsBroken += 1;
+    } else if (stage === "broken") this.stats.objectsBroken += 1;
     if (amount > 0) {
       this.stats.creditsEarned += amount;
-      this.hooks.payout({ amount, label, name: def.name, point: info.point });
+      this.hooks.payout({ amount, label, name: def.name, point: info.point, key: instanceId });
     }
+    if (stage === "destroyed" && info.definitionId) {
+      const first = this.hooks.firstBreak(info.definitionId);
+      if (first > 0) {
+        this.stats.creditsEarned += first;
+        this.hooks.payout({ amount: first, label: "first", name: def.name, point: info.point, key: `${instanceId}:first` });
+      }
+    }
+    // The stress meter follows real structural damage, not scratches.
+    if (stage === "damaged") return;
 
     const points = def.stress * this.stressPerPoint * (stage === "broken" ? BROKEN_STRESS_SHARE : 1 - BROKEN_STRESS_SHARE);
     this.stress = Math.max(0, this.stress - points);

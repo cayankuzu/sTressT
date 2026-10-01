@@ -3,8 +3,8 @@ import { BatchedMesh, Box3, BufferAttribute, BufferGeometry, type Camera, Matrix
 import { GAME } from "../config/gameConfig";
 import type { Assets } from "../core/assets";
 import type { EventBus } from "../core/events";
-import { MATERIALS } from "../data/catalog";
-import type { MaterialType, ObjectOrigin } from "../data/types";
+import { MATERIALS, MAX_TIER, OBJECTS, TOOLS } from "../data/catalog";
+import type { MaterialType, ObjectDefinition, ObjectOrigin } from "../data/types";
 import { cleanupPool } from "../economy/economy";
 import type { DebrisRecord, ObjectRecord } from "../save/schema";
 import { collisionEnergy, computeDamage, type Impact } from "./damage";
@@ -31,6 +31,8 @@ export type ImpactFeedback = {
   broke: boolean;
   /** Tool that struck (undefined for kicks and collisions). */
   toolId?: string;
+  /** The striker's level was too low: no damage, only the push. */
+  blocked?: boolean;
 };
 
 /** Main-thread time allowed per frame for turning finished fractures into physics pieces. */
@@ -77,6 +79,13 @@ export class DestructionSystem {
   /** An object fell out of the world (it is put back by the game, never silently deleted). */
   onObjectLost: (obj: Destructible) => void = () => undefined;
   onObjectGone: (obj: Destructible) => void = () => undefined;
+  /**
+   * Highest tool level the player owns. A tool hit needs the tool's own level; kicks, throws and
+   * chain reactions reach what the player could break with their best tool.
+   */
+  breakTier: () => number = () => MAX_TIER;
+  /** A direct hit (tool or kick) on something that needs a higher level. */
+  onBlocked: (obj: Destructible, impact: Impact) => void = () => undefined;
   /** A whole object came to rest in the street container (only pieces are taken). */
   onObjectInBin: (obj: Destructible) => void = () => undefined;
   /** Seconds each object has been resting inside the container. */
@@ -437,9 +446,22 @@ export class DestructionSystem {
     });
   }
 
+  /** Level of whatever struck: the tool's own, or the player's best for kicks and collisions. */
+  private impactTier(impact: Impact): number {
+    const tool = impact.toolId ? TOOLS[impact.toolId] : undefined;
+    return impact.source === "tool" && tool ? tool.tier : this.breakTier();
+  }
+
+  /** Whether `def` needs a higher level than this impact has (toys never break anyway). */
+  private lockedFor(def: ObjectDefinition | undefined, impact: Impact): boolean {
+    return !!def && def.capabilities.destructible && def.tier > this.impactTier(impact);
+  }
+
   /** Damage to a collectible piece (tool or collision); it may break into smaller ones. */
   private hitFragment(frag: Fragment, impact: Impact): boolean {
     if (!this.damageEnabled || frag.kind !== "major" || frag.state === "held" || !canRefracture(frag.radius, frag.depth, frag.mass)) return false;
+    // A piece is as hard as the object it came from.
+    if (this.lockedFor(OBJECTS[frag.definitionId], impact)) return false;
     const damage = computeDamage(impact, MATERIALS[frag.material], frag.material);
     if (damage < 0.5) return false;
     frag.hp -= damage;
@@ -472,9 +494,13 @@ export class DestructionSystem {
   }
 
   private hitObject(obj: Destructible, part: Part, impact: Impact, source: "tool" | "collision"): HitResult {
-    const result = obj.applyImpact(this.damageEnabled ? impact : { ...impact, energy: 0 }, part);
+    const def = obj.template.def;
+    const locked = this.damageEnabled && this.lockedFor(def, impact);
+    // Too weak for it: the hit still pushes, but leaves no mark and no damage.
+    const result = obj.applyImpact(this.damageEnabled && !locked ? impact : { ...impact, energy: 0 }, part);
     const point = new Vector3(...impact.point);
-    this.onFeedback({ material: result.material, energy: impact.energy, point, normal: new Vector3(...impact.normal), source, broke: result.structural, toolId: impact.toolId });
+    this.onFeedback({ material: result.material, energy: impact.energy, point, normal: new Vector3(...impact.normal), source, broke: result.structural, toolId: impact.toolId, blocked: locked });
+    if (locked && source === "tool" && impact.generation === 0) this.onBlocked(obj, impact);
     if (result.damage > 0) {
       this.events.emit("OBJECT_DAMAGED", { instanceId: obj.instanceId, health: obj.state.health, maxHealth: obj.state.maxHealth });
     }

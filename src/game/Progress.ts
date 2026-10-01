@@ -3,6 +3,7 @@ import {
   beginSession,
   checkInvariants,
   claimFoundItem,
+  collectObject,
   equipTool,
   grantReward,
   grantSafetyObject,
@@ -82,6 +83,11 @@ export class Progress {
 
   safetyObject(): Outcome<{ objectId: string }> {
     return this.commit(grantSafetyObject(this.state));
+  }
+
+  /** First destruction of a kind: its collection bonus (and the collection bonus when it completes it). */
+  collect(definitionId: string): Outcome<{ amount: number; complete: boolean; bonus: number }> {
+    return this.commit(collectObject(this.state, definitionId));
   }
 
   claimFound(foundId: string): boolean {

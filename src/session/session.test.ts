@@ -10,6 +10,7 @@ describe("session", () => {
   let ledger: Map<string, number>;
   let payouts: Payout[];
   let clears: number[];
+  let collected: Set<string>;
   let session: Session;
   const info = { oneHit: false, generation: 0 };
   const total = (): number => [...ledger.values()].reduce((a, b) => a + b, 0);
@@ -18,6 +19,7 @@ describe("session", () => {
     ledger = new Map();
     payouts = [];
     clears = [];
+    collected = new Set();
     session = new Session({
       reward: (key, amount) => {
         if (ledger.has(key)) return false;
@@ -25,6 +27,11 @@ describe("session", () => {
         return true;
       },
       payout: (p) => payouts.push(p),
+      firstBreak: (id) => {
+        if (collected.has(id)) return 0;
+        collected.add(id);
+        return 10;
+      },
       stress: () => undefined,
       combo: () => undefined,
       cleared: (bonus) => clears.push(bonus),
@@ -49,12 +56,26 @@ describe("session", () => {
     expect(total()).toBe(before);
   });
 
-  it("pays nothing for the damaged stage, toys, or outside a session", () => {
-    session.onStage("cup_a", cup, "damaged", info);
+  it("pays every stage once and the three stages add up to the value (no combo)", () => {
+    for (const stage of ["damaged", "broken", "destroyed"] as const) session.onStage("tv_a", tv, stage, info);
+    expect(ledger.size).toBe(3);
+    expect(payouts.map((p) => p.label)).toEqual(["damaged", "broken", "destroyed"]);
+    expect(payouts.every((p) => p.key === "tv_a")).toBe(true);
+    expect(total()).toBe(tv.value);
+  });
+
+  it("pays nothing for toys or outside a session", () => {
     session.onStage("duck", duck, "destroyed", info);
     session.end();
     session.onStage("cup_b", cup, "destroyed", info);
     expect(ledger.size).toBe(0);
+  });
+
+  it("pays the first-break bonus once per kind of object", () => {
+    session.onStage("cup_a", cup, "destroyed", { ...info, definitionId: "tea_cup" });
+    session.onStage("cup_b", cup, "destroyed", { ...info, definitionId: "tea_cup" });
+    expect(payouts.filter((p) => p.label === "first").length).toBe(1);
+    expect(payouts.find((p) => p.label === "first")?.key).toBe("cup_a:first");
   });
 
   it("builds a combo only across different objects and expires it", () => {

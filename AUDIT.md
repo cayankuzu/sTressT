@@ -218,3 +218,22 @@ Test turu: 66 birim testi; `feedbackAudit`, `inputAudit` ve `controllerAudit` ge
 11 turun son 7'sinde art arda geçti. İlk 4 turun 2'si, bazı vuruşlar boşa gittiği için yarım kaldı;
 bu sonra tekrarlanmadı. Muhtemel neden, panelin oyuncuyla paylaşılması ve oyunun duraklamasıydı; artık bu
 durum ölçülüyor ve raporlanıyor.
+
+## 10. Sürüm 0.1.2: seviyeli ekonomi
+
+Tasarım ve sayılar GAME_DESIGN.md'deki "Levels" ve "Economy rules" bölümlerinde; değişiklik listesi
+CHANGELOG.md'de.
+
+| Kontrol | Sonuç |
+| --- | --- |
+| Birim testleri | Geçti: seviye kuralları, mağaza kilidi, koleksiyon ve aşama ödülleri dahil |
+| Ekonomi simülatörü | Balyoz: iyi oyuncu 20,2 dk, ortalama 28,5 dk, zayıf 36,2 dk. Koleksiyon: 26,1 / 35,0 / 42,8 dk. Kimse takılmıyor |
+| Kilit (tarayıcı) | Yumruk 3. seviye sandalyeye hasar vermiyor (260/260), kilit satırı ve "Beyzbol Sopası gerekir" notu çıkıyor. 2. seviyedeyken tekme ve üstüne düşen kutu da işlemiyor; sopa alınınca tekme işliyor (260 → 187). Sopa sendeyken yumrukla vurunca "3 ile kuşan" uyarısı çıkıyor |
+| Mağaza | Kilitli eşya satın alınamıyor (`tool_required`); gruplar, işaretler, kazanç ve kâr doğru gösteriliyor |
+| Ödüller | HASAR +6, KIRILDI +15, PARÇALANDI +37, İLK KEZ! +29 (seramik vazo); aynı vuruştaki aşamalar tek balonda |
+| Seviye atlama | Tava tezgâhtan alınınca "SEVİYE 2 AÇILDI · 6 yeni eşya"; hedef Beyzbol Sopası'na geçiyor |
+| Test aracı | `feedbackAudit`, `inputAudit` ve `playthrough` geçti. Nesne taraması seviye başına örneklerde (vazo, saksı, tabure, cüce) geçti; nesne taraması artık her eşyayı yalnızca onu kırabilen aletlerle deniyor |
+
+Açık kalan, P4: tabure sopayla yakından kırılınca küçük bir kırıntı 3 denemenin 2'sinde arka
+duvardan dışarı kaçtı; bağımsız 6 denemede tekrarlanmadı. Kırıntı toplanmıyor, kayda yazılmıyor ve
+kırma bitince siliniyor.

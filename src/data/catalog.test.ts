@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { OBJECTS, ROOM, TOOL_IDS, TOOLS, validateCatalog } from "./catalog";
+import { canBreak, COLLECTIBLE_IDS, MAX_TIER, OBJECTS, objectsOfTier, ROOM, TOOL_IDS, TOOLS, toolForTier, validateCatalog } from "./catalog";
 
 describe("game data catalog", () => {
   it("is internally consistent", () => {
@@ -16,6 +16,23 @@ describe("game data catalog", () => {
     expect(ROOM.starterLayout.length).toBeGreaterThanOrEqual(4);
     expect(ROOM.starterLayout.length).toBeLessThanOrEqual(10);
     expect(ROOM.starterLayout.some((p) => (OBJECTS[p.definitionId]?.health ?? Infinity) <= 100)).toBe(true);
+    // Fists (level 1) must have at least four things to break; the rest are goals for later.
+    expect(ROOM.starterLayout.filter((p) => canBreak(1, OBJECTS[p.definitionId]!)).length).toBeGreaterThanOrEqual(4);
+  });
+
+  it("gives every level from 2 up its own tool and things to break, and the last tool breaks everything", () => {
+    for (let tier = 1; tier <= MAX_TIER; tier++) {
+      expect(TOOLS[toolForTier(tier)]?.tier).toBe(tier);
+      expect(objectsOfTier(tier).length, `level ${tier}`).toBeGreaterThanOrEqual(3);
+    }
+    const last = TOOLS[TOOL_IDS[TOOL_IDS.length - 1]!]!;
+    for (const id of COLLECTIBLE_IDS) expect(canBreak(last.tier, OBJECTS[id]!), id).toBe(true);
+    for (const id of COLLECTIBLE_IDS) expect(canBreak(OBJECTS[id]!.tier - 1, OBJECTS[id]!), id).toBe(false);
+  });
+
+  it("raises prices with the level: a level's cheapest object costs more than the level two below's dearest", () => {
+    const prices = (tier: number): number[] => objectsOfTier(tier).map((id) => OBJECTS[id]!.price);
+    for (let tier = 3; tier <= MAX_TIER; tier++) expect(Math.min(...prices(tier))).toBeGreaterThan(Math.max(...prices(tier - 2)));
   });
 
   it("only offers street finds that exist, once each", () => {

@@ -9,6 +9,7 @@ describe("economy simulation", () => {
     const rows = Object.values(byName).map((r) => ({
       player: r.player,
       ...Object.fromEntries(TOOL_IDS.slice(1).map((id) => [id, Number.isFinite(r.toolMinutes[id]) ? Number((r.toolMinutes[id] as number).toFixed(1)) : "never"])),
+      collection: Number.isFinite(r.collectionMinute) ? Number(r.collectionMinute.toFixed(1)) : `${r.collected}/36`,
       "cr@5": r.creditsAfterCycles[4],
       "cr@10": r.creditsAfterCycles[9],
     }));
@@ -27,6 +28,11 @@ describe("economy simulation", () => {
       const r = byName[name]!;
       for (const id of TOOL_IDS) expect(r.toolMinutes[id], `${name} never got ${id}`).toBeLessThan(name === "good" ? 30 : 45);
     }
+  });
+
+  it("lets a player who plays the loop properly break every kind of object once", () => {
+    expect(byName.good!.collectionMinute).toBeLessThan(40);
+    expect(byName.average!.collectionMinute).toBeLessThan(55);
   });
 
   it("never hard-locks anyone, even a careless player", () => {

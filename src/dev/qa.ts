@@ -4,7 +4,7 @@
 // It drives the real game through window.__stresst: real swings, real grabs, real physics.
 import { Quaternion, Vector3 } from "three";
 import { GAME } from "../config/gameConfig";
-import { OBJECTS, TOOL_IDS } from "../data/catalog";
+import { canBreak, OBJECTS, TOOL_IDS, TOOLS, toolForTier } from "../data/catalog";
 import { checkInvariants } from "../economy/economy";
 import { soupStats } from "../destruction/geometry/soup";
 import { ROOM, TRASH } from "../world/layout";
@@ -207,7 +207,10 @@ async function auditOne(id: string, tools: string[]): Promise<ObjectRow> {
 
   // Break with each tool, from a fresh copy every time.
   if (def.capabilities.destructible) {
-    for (const tool of tools) {
+    // Only tools of the object's level or higher can hurt it; the level's own tool is always tried.
+    const usable = tools.filter((tool) => canBreak(TOOLS[tool]?.tier ?? 1, def));
+    if (!usable.includes(toolForTier(def.tier))) usable.unshift(toolForTier(def.tier));
+    for (const tool of usable) {
       obj = await freshArena(id);
       H.equip(tool);
       await run(0.3);
@@ -729,6 +732,8 @@ export async function feedbackAudit(): Promise<Record<string, unknown>> {
     const vm = g.viewmodel;
     /** Largest move (m) and turn (1 - |dot|) of a hand during one swing. */
     const swing = (hand: any): [number, number] => {
+      // A kick or swing still running would swallow this one.
+      for (let i = 0; i < 120 && (g.tools.stage !== "idle" || g.kick.stage !== "idle"); i++) H.advance(1 / 60);
       const p0 = hand.position.clone();
       const q0 = hand.quaternion.clone();
       let dp = 0;

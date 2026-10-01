@@ -1,0 +1,617 @@
+{
+  "$comment": "Source list for the asset pipeline. maxTris = triangle budget after simplification, tex = max base-color texture size (other maps use half).",
+  "assets": [
+    {
+      "id": "boxing_glove",
+      "source": "polypizza",
+      "sourceId": "boxing_glove",
+      "url": "https://static.poly.pizza/56f7645f-9cab-4613-a2df-60e92b73a207.glb",
+      "role": "tool",
+      "maxTris": 2000,
+      "tex": 256,
+      "smooth": true,
+      "recolor": [
+        0.42,
+        0.035,
+        0.03
+      ],
+      "license": {
+        "name": "Boxing Glove",
+        "authors": [
+          "J-Toastie"
+        ],
+        "url": "https://poly.pizza/m/35PCBHLrd4",
+        "license": "CC-BY 3.0"
+      }
+    },
+    {
+      "id": "baseball_bat",
+      "source": "polyhaven",
+      "sourceId": "baseball_bat",
+      "role": "tool",
+      "maxTris": 1600,
+      "tex": 512
+    },
+    {
+      "id": "sledgehammer",
+      "source": "polyhaven",
+      "sourceId": "sledgehammer_01",
+      "role": "tool",
+      "maxTris": 1800,
+      "tex": 512
+    },
+    {
+      "id": "crowbar",
+      "source": "polyhaven",
+      "sourceId": "crowbar_01",
+      "role": "tool",
+      "maxTris": 1600,
+      "tex": 512
+    },
+    {
+      "id": "hammer",
+      "source": "polyhaven",
+      "sourceId": "cross_pein_hammer",
+      "role": "tool",
+      "maxTris": 1600,
+      "tex": 512
+    },
+    {
+      "id": "frying_pan",
+      "source": "polyhaven",
+      "sourceId": "brass_pan_01",
+      "role": "tool",
+      "maxTris": 1800,
+      "tex": 512
+    },
+    {
+      "id": "pipe_wrench",
+      "source": "polyhaven",
+      "sourceId": "pipe_wrench",
+      "role": "tool",
+      "maxTris": 2000,
+      "tex": 512
+    },
+    {
+      "id": "ceramic_vase_01",
+      "source": "polyhaven",
+      "sourceId": "ceramic_vase_01",
+      "role": "prop",
+      "maxTris": 2000,
+      "tex": 512
+    },
+    {
+      "id": "ceramic_vase_02",
+      "source": "polyhaven",
+      "sourceId": "ceramic_vase_02",
+      "role": "prop",
+      "maxTris": 2000,
+      "tex": 512
+    },
+    {
+      "id": "ceramic_vase_03",
+      "source": "polyhaven",
+      "sourceId": "ceramic_vase_03",
+      "role": "prop",
+      "maxTris": 2000,
+      "tex": 512
+    },
+    {
+      "id": "ceramic_vase_04",
+      "source": "polyhaven",
+      "sourceId": "ceramic_vase_04",
+      "role": "prop",
+      "maxTris": 2000,
+      "tex": 512
+    },
+    {
+      "id": "antique_vase",
+      "source": "polyhaven",
+      "sourceId": "antique_ceramic_vase_01",
+      "role": "prop",
+      "maxTris": 3000,
+      "tex": 512
+    },
+    {
+      "id": "clay_pot",
+      "source": "polyhaven",
+      "sourceId": "planter_pot_clay",
+      "role": "prop",
+      "maxTris": 2000,
+      "tex": 512
+    },
+    {
+      "id": "ceramic_jug",
+      "source": "polyhaven",
+      "sourceId": "jug_01",
+      "role": "prop",
+      "maxTris": 2500,
+      "tex": 512
+    },
+    {
+      "id": "tea_cup",
+      "source": "polyhaven",
+      "sourceId": "tea_set_01",
+      "role": "prop",
+      "maxTris": 1500,
+      "tex": 512,
+      "pick": [
+        "tea_set_01_cup_small_01"
+      ]
+    },
+    {
+      "id": "saucer",
+      "source": "polyhaven",
+      "sourceId": "tea_set_01",
+      "role": "prop",
+      "maxTris": 1200,
+      "tex": 512,
+      "pick": [
+        "tea_set_01_saucer_circular_03"
+      ]
+    },
+    {
+      "id": "dinner_plate",
+      "source": "polyhaven",
+      "sourceId": "tea_set_01",
+      "role": "prop",
+      "maxTris": 1200,
+      "tex": 512,
+      "pick": [
+        "tea_set_01_plate_large_circular_03"
+      ]
+    },
+    {
+      "id": "teapot",
+      "source": "polyhaven",
+      "sourceId": "tea_set_01",
+      "role": "prop",
+      "maxTris": 3000,
+      "tex": 512,
+      "pick": [
+        "tea_set_01_teapot_01",
+        "tea_set_01_teapot_01_lid"
+      ]
+    },
+    {
+      "id": "wine_bottle",
+      "source": "polyhaven",
+      "sourceId": "wine_bottles_01",
+      "role": "prop",
+      "maxTris": 2500,
+      "tex": 512,
+      "pick": [
+        "wine_bottles_01_bordeaux"
+      ]
+    },
+    {
+      "id": "champagne_bottle",
+      "source": "polyhaven",
+      "sourceId": "wine_bottles_01",
+      "role": "prop",
+      "maxTris": 2500,
+      "tex": 512,
+      "pick": [
+        "wine_bottles_01_champagne"
+      ]
+    },
+    {
+      "id": "crt_tv",
+      "source": "polyhaven",
+      "sourceId": "Television_01",
+      "role": "prop",
+      "maxTris": 2500,
+      "tex": 1024
+    },
+    {
+      "id": "small_tv",
+      "source": "polyhaven",
+      "sourceId": "television_02",
+      "role": "prop",
+      "maxTris": 2500,
+      "tex": 512
+    },
+    {
+      "id": "laptop",
+      "source": "polyhaven",
+      "sourceId": "classic_laptop",
+      "role": "prop",
+      "maxTris": 4000,
+      "tex": 512
+    },
+    {
+      "id": "boombox",
+      "source": "polyhaven",
+      "sourceId": "boombox",
+      "role": "prop",
+      "maxTris": 4000,
+      "tex": 512
+    },
+    {
+      "id": "microwave",
+      "source": "polyhaven",
+      "sourceId": "vintage_microwave",
+      "role": "prop",
+      "maxTris": 4000,
+      "tex": 512
+    },
+    {
+      "id": "alarm_clock",
+      "source": "polyhaven",
+      "sourceId": "alarm_clock_01",
+      "role": "prop",
+      "maxTris": 3000,
+      "tex": 512
+    },
+    {
+      "id": "wooden_chair",
+      "source": "polyhaven",
+      "sourceId": "painted_wooden_chair_01",
+      "role": "prop",
+      "maxTris": 2000,
+      "tex": 512
+    },
+    {
+      "id": "plastic_chair",
+      "source": "polyhaven",
+      "sourceId": "plastic_monobloc_chair_01",
+      "role": "prop",
+      "maxTris": 3000,
+      "tex": 512
+    },
+    {
+      "id": "school_chair",
+      "source": "polyhaven",
+      "sourceId": "SchoolChair_01",
+      "role": "prop",
+      "maxTris": 4000,
+      "tex": 512
+    },
+    {
+      "id": "wooden_stool",
+      "source": "polyhaven",
+      "sourceId": "painted_wooden_stool",
+      "role": "prop",
+      "maxTris": 1500,
+      "tex": 512
+    },
+    {
+      "id": "side_table",
+      "source": "polyhaven",
+      "sourceId": "side_table_01",
+      "role": "prop",
+      "maxTris": 3000,
+      "tex": 512
+    },
+    {
+      "id": "wooden_table",
+      "source": "polyhaven",
+      "sourceId": "small_wooden_table_01",
+      "role": "prop",
+      "maxTris": 3500,
+      "tex": 512
+    },
+    {
+      "id": "nightstand",
+      "source": "polyhaven",
+      "sourceId": "painted_wooden_nightstand",
+      "role": "prop",
+      "maxTris": 1500,
+      "tex": 512
+    },
+    {
+      "id": "wooden_cabinet",
+      "source": "polyhaven",
+      "sourceId": "painted_wooden_cabinet",
+      "role": "prop",
+      "maxTris": 2500,
+      "tex": 1024
+    },
+    {
+      "id": "cardboard_box",
+      "source": "polyhaven",
+      "sourceId": "cardboard_box_01",
+      "role": "prop",
+      "maxTris": 2500,
+      "tex": 512
+    },
+    {
+      "id": "wooden_crate",
+      "source": "polyhaven",
+      "sourceId": "wooden_crate_01",
+      "role": "prop",
+      "maxTris": 3000,
+      "tex": 512
+    },
+    {
+      "id": "wet_floor_sign",
+      "source": "polyhaven",
+      "sourceId": "WetFloorSign_01",
+      "role": "prop",
+      "maxTris": 1000,
+      "tex": 512
+    },
+    {
+      "id": "marble_bust",
+      "source": "polyhaven",
+      "sourceId": "marble_bust_01",
+      "role": "prop",
+      "maxTris": 5000,
+      "tex": 1024
+    },
+    {
+      "id": "garden_gnome",
+      "source": "polyhaven",
+      "sourceId": "garden_gnome",
+      "role": "prop",
+      "maxTris": 4000,
+      "tex": 512
+    },
+    {
+      "id": "cat_statue",
+      "source": "polyhaven",
+      "sourceId": "concrete_cat_statue",
+      "role": "prop",
+      "maxTris": 3500,
+      "tex": 512
+    },
+    {
+      "id": "mirror",
+      "source": "polyhaven",
+      "sourceId": "ornate_mirror_01",
+      "role": "prop",
+      "maxTris": 4000,
+      "tex": 512
+    },
+    {
+      "id": "picture_frame",
+      "source": "polyhaven",
+      "sourceId": "standing_picture_frame_01",
+      "role": "prop",
+      "maxTris": 1600,
+      "tex": 512
+    },
+    {
+      "id": "metal_barrel",
+      "source": "polyhaven",
+      "sourceId": "Barrel_01",
+      "role": "prop",
+      "maxTris": 2500,
+      "tex": 512
+    },
+    {
+      "id": "old_tyre",
+      "source": "polyhaven",
+      "sourceId": "old_tyre",
+      "role": "prop",
+      "maxTris": 2500,
+      "tex": 512
+    },
+    {
+      "id": "football",
+      "source": "polyhaven",
+      "sourceId": "football",
+      "role": "prop",
+      "maxTris": 2000,
+      "tex": 512,
+      "pick": [
+        "football_inflated"
+      ]
+    },
+    {
+      "id": "rubber_duck",
+      "source": "polyhaven",
+      "sourceId": "rubber_duck_toy",
+      "role": "prop",
+      "maxTris": 2000,
+      "tex": 512
+    },
+    {
+      "id": "fluorescent_lights",
+      "source": "polyhaven",
+      "sourceId": "mounted_fluorescent_lights",
+      "role": "static",
+      "maxTris": 1500,
+      "tex": 256,
+      "pick": [
+        "mounted_fluorescent_lights_a"
+      ]
+    },
+    {
+      "id": "shutter_door",
+      "source": "polyhaven",
+      "sourceId": "rollershutter_door",
+      "role": "static",
+      "maxTris": 1200,
+      "tex": 1024,
+      "pick": [
+        "rollershutter_door"
+      ]
+    },
+    {
+      "id": "shutter_window",
+      "source": "polyhaven",
+      "sourceId": "rollershutter_window_01",
+      "role": "static",
+      "maxTris": 1200,
+      "tex": 1024,
+      "pick": [
+        "rollershutter_window_01"
+      ]
+    },
+    {
+      "id": "street_lamp",
+      "source": "polyhaven",
+      "sourceId": "street_lamp_02",
+      "role": "static",
+      "maxTris": 2500,
+      "tex": 512
+    },
+    {
+      "id": "covered_car",
+      "source": "polyhaven",
+      "sourceId": "covered_car",
+      "role": "static",
+      "maxTris": 4000,
+      "tex": 1024
+    },
+    {
+      "id": "trash_can",
+      "source": "polyhaven",
+      "sourceId": "metal_trash_can",
+      "role": "static",
+      "maxTris": 3000,
+      "tex": 512,
+      "pick": [
+        "metal_trash_can",
+        "metal_trash_can_lid",
+        "metal_trash_can_handle_left",
+        "metal_trash_can_handle_right"
+      ]
+    },
+    {
+      "id": "utility_box",
+      "source": "polyhaven",
+      "sourceId": "utility_box_01",
+      "role": "static",
+      "maxTris": 2000,
+      "tex": 512
+    },
+    {
+      "id": "manhole",
+      "source": "polyhaven",
+      "sourceId": "water_manhole_cover",
+      "role": "static",
+      "maxTris": 800,
+      "tex": 512
+    },
+    {
+      "id": "road_barrier",
+      "source": "polyhaven",
+      "sourceId": "concrete_road_barrier_02",
+      "role": "static",
+      "maxTris": 2500,
+      "tex": 512
+    },
+    {
+      "id": "fire_hydrant",
+      "source": "polyhaven",
+      "sourceId": "fire_hydrant",
+      "role": "static",
+      "maxTris": 2500,
+      "tex": 512,
+      "pick": [
+        "fire_hydrant",
+        "fire_hydrant_cap_01",
+        "fire_hydrant_cap_02",
+        "fire_hydrant_cap_03"
+      ]
+    },
+    {
+      "id": "aircon_unit",
+      "source": "polyhaven",
+      "sourceId": "exterior_aircon_unit",
+      "role": "static",
+      "maxTris": 2500,
+      "tex": 512,
+      "pick": [
+        "exterior_aircon_unit"
+      ]
+    },
+    {
+      "id": "boot",
+      "source": "polyhaven",
+      "sourceId": "rubber_boots",
+      "role": "tool",
+      "maxTris": 2500,
+      "tex": 512,
+      "pick": [
+        "rubber_boots_r"
+      ]
+    },
+    {
+      "id": "desk_lamp",
+      "source": "polyhaven",
+      "sourceId": "industrial_pipe_lamp",
+      "role": "prop",
+      "maxTris": 2500,
+      "tex": 512
+    },
+    {
+      "id": "trashbag",
+      "source": "polyhaven",
+      "sourceId": "trashbag",
+      "role": "static",
+      "maxTris": 1500,
+      "tex": 512
+    }
+  ],
+  "textures": [
+    {
+      "id": "rubber_floor",
+      "source": "polyhaven",
+      "sourceId": "rubber_tiles",
+      "size": 512
+    },
+    {
+      "id": "room_wall",
+      "source": "polyhaven",
+      "sourceId": "concrete_wall_004",
+      "size": 512
+    },
+    {
+      "id": "room_ceiling",
+      "source": "polyhaven",
+      "sourceId": "concrete_floor_worn_001",
+      "size": 512
+    },
+    {
+      "id": "asphalt",
+      "source": "polyhaven",
+      "sourceId": "asphalt_02",
+      "size": 512
+    },
+    {
+      "id": "sidewalk",
+      "source": "polyhaven",
+      "sourceId": "concrete_pavers",
+      "size": 512
+    },
+    {
+      "id": "facade_rage",
+      "source": "polyhaven",
+      "sourceId": "factory_brick",
+      "size": 512
+    },
+    {
+      "id": "facade_tools",
+      "source": "polyhaven",
+      "sourceId": "dark_brick_wall",
+      "size": 512
+    },
+    {
+      "id": "facade_objects",
+      "source": "polyhaven",
+      "sourceId": "exterior_wall_cladding_03",
+      "size": 512
+    },
+    {
+      "id": "metal_plate",
+      "source": "polyhaven",
+      "sourceId": "metal_plate",
+      "size": 512
+    },
+    {
+      "id": "alley_wall",
+      "source": "polyhaven",
+      "sourceId": "concrete_wall_008",
+      "size": 512
+    },
+    {
+      "id": "dumpster_metal",
+      "source": "polyhaven",
+      "sourceId": "green_metal_rust",
+      "size": 512
+    }
+  ]
+}

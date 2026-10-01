@@ -1,0 +1,1561 @@
+{
+  "models": {
+    "boxing_glove": {
+      "file": "assets/models/boxing_glove.glb",
+      "role": "tool",
+      "triangles": 1096,
+      "size": [
+        0.606,
+        1.2348,
+        0.7531
+      ],
+      "materials": [
+        "red"
+      ],
+      "bytes": 80408,
+      "license": {
+        "name": "Boxing Glove",
+        "authors": [
+          "J-Toastie"
+        ],
+        "url": "https://poly.pizza/m/35PCBHLrd4",
+        "license": "CC-BY 3.0",
+        "site": "Poly Pizza"
+      }
+    },
+    "baseball_bat": {
+      "file": "assets/models/baseball_bat.glb",
+      "role": "tool",
+      "triangles": 1599,
+      "size": [
+        0.0635,
+        0.9132,
+        0.0635
+      ],
+      "materials": [
+        "baseball_bat"
+      ],
+      "bytes": 86352,
+      "license": {
+        "name": "Baseball Bat",
+        "authors": [
+          "Enrique Martín"
+        ],
+        "url": "https://polyhaven.com/a/baseball_bat",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "sledgehammer": {
+      "file": "assets/models/sledgehammer.glb",
+      "role": "tool",
+      "triangles": 1800,
+      "size": [
+        0.2085,
+        1.0056,
+        0.0905
+      ],
+      "materials": [
+        "sledgehammer_01"
+      ],
+      "bytes": 100520,
+      "license": {
+        "name": "Sledgehammer 01",
+        "authors": [
+          "Dylan Guzman"
+        ],
+        "url": "https://polyhaven.com/a/sledgehammer_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "crowbar": {
+      "file": "assets/models/crowbar.glb",
+      "role": "tool",
+      "triangles": 1600,
+      "size": [
+        0.0404,
+        0.5554,
+        0.1276
+      ],
+      "materials": [
+        "crowbar_01"
+      ],
+      "bytes": 85560,
+      "license": {
+        "name": "Crowbar 01",
+        "authors": [
+          "Alexander Otterbeck"
+        ],
+        "url": "https://polyhaven.com/a/crowbar_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "hammer": {
+      "file": "assets/models/hammer.glb",
+      "role": "tool",
+      "triangles": 1600,
+      "size": [
+        0.099,
+        0.3002,
+        0.0243
+      ],
+      "materials": [
+        "cross_pein_hammer"
+      ],
+      "bytes": 92200,
+      "license": {
+        "name": "Cross Pein Hammer",
+        "authors": [
+          "Tics"
+        ],
+        "url": "https://polyhaven.com/a/cross_pein_hammer",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "frying_pan": {
+      "file": "assets/models/frying_pan.glb",
+      "role": "tool",
+      "triangles": 1800,
+      "size": [
+        0.1913,
+        0.0523,
+        0.4497
+      ],
+      "materials": [
+        "brass_pan_01"
+      ],
+      "bytes": 98764,
+      "license": {
+        "name": "Brass Pan 01",
+        "authors": [
+          "Rico Cilliers"
+        ],
+        "url": "https://polyhaven.com/a/brass_pan_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "pipe_wrench": {
+      "file": "assets/models/pipe_wrench.glb",
+      "role": "tool",
+      "triangles": 2000,
+      "size": [
+        0.0839,
+        0.4042,
+        0.0339
+      ],
+      "materials": [
+        "pipe_wrench"
+      ],
+      "bytes": 174344,
+      "license": {
+        "name": "Pipe Wrench",
+        "authors": [
+          "Will Evarts"
+        ],
+        "url": "https://polyhaven.com/a/pipe_wrench",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "ceramic_vase_01": {
+      "file": "assets/models/ceramic_vase_01.glb",
+      "role": "prop",
+      "triangles": 2000,
+      "size": [
+        0.2022,
+        0.4003,
+        0.2024
+      ],
+      "materials": [
+        "ceramic_vase_01"
+      ],
+      "bytes": 74796,
+      "license": {
+        "name": "Ceramic Vase 01",
+        "authors": [
+          "James Ray Cock"
+        ],
+        "url": "https://polyhaven.com/a/ceramic_vase_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "ceramic_vase_02": {
+      "file": "assets/models/ceramic_vase_02.glb",
+      "role": "prop",
+      "triangles": 2200,
+      "size": [
+        0.2176,
+        0.3088,
+        0.2176
+      ],
+      "materials": [
+        "ceramic_vase_02"
+      ],
+      "bytes": 102728,
+      "license": {
+        "name": "Ceramic Vase 02",
+        "authors": [
+          "James Ray Cock"
+        ],
+        "url": "https://polyhaven.com/a/ceramic_vase_02",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "ceramic_vase_03": {
+      "file": "assets/models/ceramic_vase_03.glb",
+      "role": "prop",
+      "triangles": 2000,
+      "size": [
+        0.1121,
+        0.4143,
+        0.1121
+      ],
+      "materials": [
+        "ceramic_vase_03"
+      ],
+      "bytes": 104924,
+      "license": {
+        "name": "Ceramic Vase 03",
+        "authors": [
+          "James Ray Cock"
+        ],
+        "url": "https://polyhaven.com/a/ceramic_vase_03",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "ceramic_vase_04": {
+      "file": "assets/models/ceramic_vase_04.glb",
+      "role": "prop",
+      "triangles": 2000,
+      "size": [
+        0.1799,
+        0.3413,
+        0.1811
+      ],
+      "materials": [
+        "ceramic_vase_04"
+      ],
+      "bytes": 88864,
+      "license": {
+        "name": "Ceramic Vase 04",
+        "authors": [
+          "James Ray Cock"
+        ],
+        "url": "https://polyhaven.com/a/ceramic_vase_04",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "antique_vase": {
+      "file": "assets/models/antique_vase.glb",
+      "role": "prop",
+      "triangles": 3000,
+      "size": [
+        0.2549,
+        0.4396,
+        0.255
+      ],
+      "materials": [
+        "antique_ceramic_vase_01"
+      ],
+      "bytes": 119596,
+      "license": {
+        "name": "Antique Ceramic Vase 01",
+        "authors": [
+          "James Ray Cock"
+        ],
+        "url": "https://polyhaven.com/a/antique_ceramic_vase_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "clay_pot": {
+      "file": "assets/models/clay_pot.glb",
+      "role": "prop",
+      "triangles": 2000,
+      "size": [
+        0.266,
+        0.2219,
+        0.2635
+      ],
+      "materials": [
+        "planter_pot_clay"
+      ],
+      "bytes": 93856,
+      "license": {
+        "name": "Planter Pot Clay",
+        "authors": [
+          "Amal Kumar"
+        ],
+        "url": "https://polyhaven.com/a/planter_pot_clay",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "ceramic_jug": {
+      "file": "assets/models/ceramic_jug.glb",
+      "role": "prop",
+      "triangles": 2500,
+      "size": [
+        0.275,
+        0.2113,
+        0.1675
+      ],
+      "materials": [
+        "jug_01"
+      ],
+      "bytes": 85148,
+      "license": {
+        "name": "Jug 01",
+        "authors": [
+          "Kuutti Siitonen"
+        ],
+        "url": "https://polyhaven.com/a/jug_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "tea_cup": {
+      "file": "assets/models/tea_cup.glb",
+      "role": "prop",
+      "triangles": 1500,
+      "size": [
+        0.1068,
+        0.0674,
+        0.133
+      ],
+      "materials": [
+        "tea_set_01"
+      ],
+      "bytes": 80352,
+      "license": {
+        "name": "Tea Set 01",
+        "authors": [
+          "James Ray Cock",
+          "Rico Cilliers",
+          "Jurita Burger"
+        ],
+        "url": "https://polyhaven.com/a/tea_set_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "saucer": {
+      "file": "assets/models/saucer.glb",
+      "role": "prop",
+      "triangles": 1200,
+      "size": [
+        0.149,
+        0.0158,
+        0.149
+      ],
+      "materials": [
+        "tea_set_01"
+      ],
+      "bytes": 69784,
+      "license": {
+        "name": "Tea Set 01",
+        "authors": [
+          "James Ray Cock",
+          "Rico Cilliers",
+          "Jurita Burger"
+        ],
+        "url": "https://polyhaven.com/a/tea_set_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "dinner_plate": {
+      "file": "assets/models/dinner_plate.glb",
+      "role": "prop",
+      "triangles": 1200,
+      "size": [
+        0.1875,
+        0.0177,
+        0.1875
+      ],
+      "materials": [
+        "tea_set_01"
+      ],
+      "bytes": 69796,
+      "license": {
+        "name": "Tea Set 01",
+        "authors": [
+          "James Ray Cock",
+          "Rico Cilliers",
+          "Jurita Burger"
+        ],
+        "url": "https://polyhaven.com/a/tea_set_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "teapot": {
+      "file": "assets/models/teapot.glb",
+      "role": "prop",
+      "triangles": 3000,
+      "size": [
+        0.1648,
+        0.164,
+        0.2678
+      ],
+      "materials": [
+        "tea_set_01"
+      ],
+      "bytes": 117356,
+      "license": {
+        "name": "Tea Set 01",
+        "authors": [
+          "James Ray Cock",
+          "Rico Cilliers",
+          "Jurita Burger"
+        ],
+        "url": "https://polyhaven.com/a/tea_set_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "wine_bottle": {
+      "file": "assets/models/wine_bottle.glb",
+      "role": "prop",
+      "triangles": 2506,
+      "size": [
+        0.074,
+        0.298,
+        0.074
+      ],
+      "materials": [
+        "wine_bottles_01_glass_orange",
+        "wine_bottles_01_seal_cork",
+        "wine_bottles_01_wine_red",
+        "wine_bottles_01_ftero_vinea_02"
+      ],
+      "bytes": 121076,
+      "license": {
+        "name": "Wine Bottles 01",
+        "authors": [
+          "Rico Cilliers",
+          "Jurita Burger"
+        ],
+        "url": "https://polyhaven.com/a/wine_bottles_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "champagne_bottle": {
+      "file": "assets/models/champagne_bottle.glb",
+      "role": "prop",
+      "triangles": 2580,
+      "size": [
+        0.0806,
+        0.3155,
+        0.0805
+      ],
+      "materials": [
+        "wine_bottles_01_seal_cork",
+        "wine_bottles_01_wine_red",
+        "wine_bottles_01_glass_green",
+        "wine_bottles_01_ftero_vinea_01"
+      ],
+      "bytes": 108476,
+      "license": {
+        "name": "Wine Bottles 01",
+        "authors": [
+          "Rico Cilliers",
+          "Jurita Burger"
+        ],
+        "url": "https://polyhaven.com/a/wine_bottles_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "crt_tv": {
+      "file": "assets/models/crt_tv.glb",
+      "role": "prop",
+      "triangles": 1918,
+      "size": [
+        0.6,
+        0.4568,
+        0.4708
+      ],
+      "materials": [
+        "Television_01"
+      ],
+      "bytes": 211796,
+      "license": {
+        "name": "Television 01",
+        "authors": [
+          "Gabriel Radić"
+        ],
+        "url": "https://polyhaven.com/a/Television_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "small_tv": {
+      "file": "assets/models/small_tv.glb",
+      "role": "prop",
+      "triangles": 2310,
+      "size": [
+        0.3997,
+        0.4114,
+        0.3502
+      ],
+      "materials": [
+        "television_02"
+      ],
+      "bytes": 115884,
+      "license": {
+        "name": "Television 02",
+        "authors": [
+          "Benny Weimer"
+        ],
+        "url": "https://polyhaven.com/a/television_02",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "laptop": {
+      "file": "assets/models/laptop.glb",
+      "role": "prop",
+      "triangles": 4392,
+      "size": [
+        0.6519,
+        0.5428,
+        0.4859
+      ],
+      "materials": [
+        "classic_laptop",
+        "classic_laptop_screen"
+      ],
+      "bytes": 280752,
+      "license": {
+        "name": "Classic Laptop",
+        "authors": [
+          "Arrangemonk"
+        ],
+        "url": "https://polyhaven.com/a/classic_laptop",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "boombox": {
+      "file": "assets/models/boombox.glb",
+      "role": "prop",
+      "triangles": 4056,
+      "size": [
+        0.7238,
+        0.4695,
+        0.1865
+      ],
+      "materials": [
+        "boombox",
+        "boombox_speakers"
+      ],
+      "bytes": 274684,
+      "license": {
+        "name": "Boombox",
+        "authors": [
+          "Thomas Paul Mouilleron"
+        ],
+        "url": "https://polyhaven.com/a/boombox",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "microwave": {
+      "file": "assets/models/microwave.glb",
+      "role": "prop",
+      "triangles": 3999,
+      "size": [
+        1.0736,
+        0.5258,
+        0.7456
+      ],
+      "materials": [
+        "vintage_microwave",
+        "vintage_microwave_glass"
+      ],
+      "bytes": 167044,
+      "license": {
+        "name": "Vintage Microwave",
+        "authors": [
+          "Adam Nekola"
+        ],
+        "url": "https://polyhaven.com/a/vintage_microwave",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "alarm_clock": {
+      "file": "assets/models/alarm_clock.glb",
+      "role": "prop",
+      "triangles": 3393,
+      "size": [
+        0.1312,
+        0.1738,
+        0.0666
+      ],
+      "materials": [
+        "alarm_clock_01",
+        "alarm_clock_01_Glass"
+      ],
+      "bytes": 175456,
+      "license": {
+        "name": "Alarm Clock 01",
+        "authors": [
+          "Yann Kervran",
+          "James Ray Cock"
+        ],
+        "url": "https://polyhaven.com/a/alarm_clock_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "wooden_chair": {
+      "file": "assets/models/wooden_chair.glb",
+      "role": "prop",
+      "triangles": 724,
+      "size": [
+        0.4318,
+        0.9565,
+        0.5398
+      ],
+      "materials": [
+        "painted_wooden_chair_01"
+      ],
+      "bytes": 90388,
+      "license": {
+        "name": "Painted Wooden Chair 01",
+        "authors": [
+          "Kuutti Siitonen"
+        ],
+        "url": "https://polyhaven.com/a/painted_wooden_chair_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "plastic_chair": {
+      "file": "assets/models/plastic_chair.glb",
+      "role": "prop",
+      "triangles": 3000,
+      "size": [
+        0.6419,
+        0.8798,
+        0.6276
+      ],
+      "materials": [
+        "plastic_monobloc_chair_01"
+      ],
+      "bytes": 179984,
+      "license": {
+        "name": "Plastic Monobloc Chair 01",
+        "authors": [
+          "Kuutti Siitonen"
+        ],
+        "url": "https://polyhaven.com/a/plastic_monobloc_chair_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "school_chair": {
+      "file": "assets/models/school_chair.glb",
+      "role": "prop",
+      "triangles": 4000,
+      "size": [
+        0.5659,
+        1.006,
+        0.6752
+      ],
+      "materials": [
+        "SchoolChair_01"
+      ],
+      "bytes": 140328,
+      "license": {
+        "name": "School Chair 01",
+        "authors": [
+          "Ethan Place"
+        ],
+        "url": "https://polyhaven.com/a/SchoolChair_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "wooden_stool": {
+      "file": "assets/models/wooden_stool.glb",
+      "role": "prop",
+      "triangles": 676,
+      "size": [
+        0.3848,
+        0.5789,
+        0.4061
+      ],
+      "materials": [
+        "painted_wooden_stool"
+      ],
+      "bytes": 81620,
+      "license": {
+        "name": "Painted Wooden Stool",
+        "authors": [
+          "Kirill Sannikov"
+        ],
+        "url": "https://polyhaven.com/a/painted_wooden_stool",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "side_table": {
+      "file": "assets/models/side_table.glb",
+      "role": "prop",
+      "triangles": 2756,
+      "size": [
+        0.55,
+        0.5507,
+        0.45
+      ],
+      "materials": [
+        "side_table_01"
+      ],
+      "bytes": 165104,
+      "license": {
+        "name": "Side Table 01",
+        "authors": [
+          "James Ray Cock"
+        ],
+        "url": "https://polyhaven.com/a/side_table_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "wooden_table": {
+      "file": "assets/models/wooden_table.glb",
+      "role": "prop",
+      "triangles": 3410,
+      "size": [
+        0.9162,
+        0.5331,
+        0.44
+      ],
+      "materials": [
+        "small_wooden_table_01"
+      ],
+      "bytes": 119772,
+      "license": {
+        "name": "Small Wooden Table 01",
+        "authors": [
+          "Ulan Cabanilla"
+        ],
+        "url": "https://polyhaven.com/a/small_wooden_table_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "nightstand": {
+      "file": "assets/models/nightstand.glb",
+      "role": "prop",
+      "triangles": 470,
+      "size": [
+        0.5046,
+        0.6155,
+        0.5087
+      ],
+      "materials": [
+        "painted_wooden_nightstand"
+      ],
+      "bytes": 69428,
+      "license": {
+        "name": "Painted Wooden Nightstand",
+        "authors": [
+          "Kirill Sannikov"
+        ],
+        "url": "https://polyhaven.com/a/painted_wooden_nightstand",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "wooden_cabinet": {
+      "file": "assets/models/wooden_cabinet.glb",
+      "role": "prop",
+      "triangles": 2227,
+      "size": [
+        1.1947,
+        1.1819,
+        0.6166
+      ],
+      "materials": [
+        "painted_wooden_cabinet"
+      ],
+      "bytes": 256244,
+      "license": {
+        "name": "Painted Wooden Cabinet",
+        "authors": [
+          "Kirill Sannikov"
+        ],
+        "url": "https://polyhaven.com/a/painted_wooden_cabinet",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "cardboard_box": {
+      "file": "assets/models/cardboard_box.glb",
+      "role": "prop",
+      "triangles": 2500,
+      "size": [
+        0.3869,
+        0.3418,
+        0.5159
+      ],
+      "materials": [
+        "cardboard_box_01"
+      ],
+      "bytes": 109524,
+      "license": {
+        "name": "Cardboard Box 01",
+        "authors": [
+          "Rahul Chaudhary"
+        ],
+        "url": "https://polyhaven.com/a/cardboard_box_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "wooden_crate": {
+      "file": "assets/models/wooden_crate.glb",
+      "role": "prop",
+      "triangles": 3000,
+      "size": [
+        0.8245,
+        0.3495,
+        0.4071
+      ],
+      "materials": [
+        "wooden_crate_01"
+      ],
+      "bytes": 154468,
+      "license": {
+        "name": "Wooden Crate 01",
+        "authors": [
+          "James Ray Cock"
+        ],
+        "url": "https://polyhaven.com/a/wooden_crate_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "wet_floor_sign": {
+      "file": "assets/models/wet_floor_sign.glb",
+      "role": "prop",
+      "triangles": 228,
+      "size": [
+        0.3001,
+        0.6295,
+        0.3585
+      ],
+      "materials": [
+        "WetFloorSign_01"
+      ],
+      "bytes": 37372,
+      "license": {
+        "name": "Wet Floor Sign 01",
+        "authors": [
+          "Fran Calvente"
+        ],
+        "url": "https://polyhaven.com/a/WetFloorSign_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "marble_bust": {
+      "file": "assets/models/marble_bust.glb",
+      "role": "prop",
+      "triangles": 5000,
+      "size": [
+        0.2717,
+        0.5148,
+        0.2997
+      ],
+      "materials": [
+        "marble_bust_01"
+      ],
+      "bytes": 305560,
+      "license": {
+        "name": "Marble Bust 01",
+        "authors": [
+          "Rico Cilliers"
+        ],
+        "url": "https://polyhaven.com/a/marble_bust_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "garden_gnome": {
+      "file": "assets/models/garden_gnome.glb",
+      "role": "prop",
+      "triangles": 3999,
+      "size": [
+        0.2574,
+        0.5984,
+        0.2092
+      ],
+      "materials": [
+        "garden_gnome_01"
+      ],
+      "bytes": 179104,
+      "license": {
+        "name": "Garden Gnome",
+        "authors": [
+          "Bhargav Kubal"
+        ],
+        "url": "https://polyhaven.com/a/garden_gnome",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "cat_statue": {
+      "file": "assets/models/cat_statue.glb",
+      "role": "prop",
+      "triangles": 3500,
+      "size": [
+        0.1529,
+        0.283,
+        0.25
+      ],
+      "materials": [
+        "concrete_cat_statue"
+      ],
+      "bytes": 201324,
+      "license": {
+        "name": "Concrete Cat Statue",
+        "authors": [
+          "Rico Cilliers",
+          "Riley Queen"
+        ],
+        "url": "https://polyhaven.com/a/concrete_cat_statue",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "mirror": {
+      "file": "assets/models/mirror.glb",
+      "role": "prop",
+      "triangles": 3999,
+      "size": [
+        0.4865,
+        0.7442,
+        0.026
+      ],
+      "materials": [
+        "ornate_mirror_01"
+      ],
+      "bytes": 159704,
+      "license": {
+        "name": "Ornate Mirror 01",
+        "authors": [
+          "James Ray Cock"
+        ],
+        "url": "https://polyhaven.com/a/ornate_mirror_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "picture_frame": {
+      "file": "assets/models/picture_frame.glb",
+      "role": "prop",
+      "triangles": 1600,
+      "size": [
+        0.1003,
+        0.2497,
+        0.2008
+      ],
+      "materials": [
+        "standing_picture_frame_01_glass",
+        "standing_picture_frame_01_artwork",
+        "standing_picture_frame_01"
+      ],
+      "bytes": 92284,
+      "license": {
+        "name": "Standing Picture Frame 01",
+        "authors": [
+          "James Ray Cock"
+        ],
+        "url": "https://polyhaven.com/a/standing_picture_frame_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "metal_barrel": {
+      "file": "assets/models/metal_barrel.glb",
+      "role": "prop",
+      "triangles": 2500,
+      "size": [
+        0.563,
+        0.88,
+        0.563
+      ],
+      "materials": [
+        "Barrel_01"
+      ],
+      "bytes": 146388,
+      "license": {
+        "name": "Barrel_01",
+        "authors": [
+          "Jorge Camacho"
+        ],
+        "url": "https://polyhaven.com/a/Barrel_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "old_tyre": {
+      "file": "assets/models/old_tyre.glb",
+      "role": "prop",
+      "triangles": 2500,
+      "size": [
+        0.6,
+        0.6,
+        0.165
+      ],
+      "materials": [
+        "old_tyre"
+      ],
+      "bytes": 141252,
+      "license": {
+        "name": "Old Tyre",
+        "authors": [
+          "MP"
+        ],
+        "url": "https://polyhaven.com/a/old_tyre",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "football": {
+      "file": "assets/models/football.glb",
+      "role": "prop",
+      "triangles": 1920,
+      "size": [
+        0.2203,
+        0.2219,
+        0.2206
+      ],
+      "materials": [
+        "football"
+      ],
+      "bytes": 144256,
+      "license": {
+        "name": "Football",
+        "authors": [
+          "Amal Kumar"
+        ],
+        "url": "https://polyhaven.com/a/football",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "rubber_duck": {
+      "file": "assets/models/rubber_duck.glb",
+      "role": "prop",
+      "triangles": 2000,
+      "size": [
+        0.2135,
+        0.2855,
+        0.3
+      ],
+      "materials": [
+        "rubber_duck_toy"
+      ],
+      "bytes": 70808,
+      "license": {
+        "name": "Rubber Duck Toy",
+        "authors": [
+          "Plat251"
+        ],
+        "url": "https://polyhaven.com/a/rubber_duck_toy",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "fluorescent_lights": {
+      "file": "assets/models/fluorescent_lights.glb",
+      "role": "static",
+      "triangles": 1496,
+      "size": [
+        0.9122,
+        0.0354,
+        0.0402
+      ],
+      "materials": [
+        "mounted_fluorescent_lights",
+        "mounted_fluorescent_lights_glass"
+      ],
+      "bytes": 62200,
+      "license": {
+        "name": "Mounted Fluorescent Lights",
+        "authors": [
+          "Ulan Cabanilla"
+        ],
+        "url": "https://polyhaven.com/a/mounted_fluorescent_lights",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "shutter_door": {
+      "file": "assets/models/shutter_door.glb",
+      "role": "static",
+      "triangles": 552,
+      "size": [
+        1.08,
+        2.4,
+        0.3001
+      ],
+      "materials": [
+        "rollershutter_door"
+      ],
+      "bytes": 149696,
+      "license": {
+        "name": "Rollershutter Door",
+        "authors": [
+          "MP"
+        ],
+        "url": "https://polyhaven.com/a/rollershutter_door",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "shutter_window": {
+      "file": "assets/models/shutter_window.glb",
+      "role": "static",
+      "triangles": 552,
+      "size": [
+        2.1,
+        1.8507,
+        0.3001
+      ],
+      "materials": [
+        "rollershutter_window_01"
+      ],
+      "bytes": 137552,
+      "license": {
+        "name": "Rollershutter Window 01",
+        "authors": [
+          "MP"
+        ],
+        "url": "https://polyhaven.com/a/rollershutter_window_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "street_lamp": {
+      "file": "assets/models/street_lamp.glb",
+      "role": "static",
+      "triangles": 2694,
+      "size": [
+        0.3849,
+        1.6715,
+        0.8053
+      ],
+      "materials": [
+        "street_lamp_02",
+        "street_lamp_02_glass"
+      ],
+      "bytes": 129516,
+      "license": {
+        "name": "Street Lamp 02",
+        "authors": [
+          "Josh Dean"
+        ],
+        "url": "https://polyhaven.com/a/street_lamp_02",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "covered_car": {
+      "file": "assets/models/covered_car.glb",
+      "role": "static",
+      "triangles": 3973,
+      "size": [
+        1.7877,
+        1.4056,
+        4.3752
+      ],
+      "materials": [
+        "covered_car"
+      ],
+      "bytes": 311988,
+      "license": {
+        "name": "Covered Car",
+        "authors": [
+          "MP"
+        ],
+        "url": "https://polyhaven.com/a/covered_car",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "trash_can": {
+      "file": "assets/models/trash_can.glb",
+      "role": "static",
+      "triangles": 2999,
+      "size": [
+        0.7773,
+        0.9062,
+        0.5543
+      ],
+      "materials": [
+        "metal_trash_can"
+      ],
+      "bytes": 157048,
+      "license": {
+        "name": "Metal Trash Can",
+        "authors": [
+          "GurJas Studios"
+        ],
+        "url": "https://polyhaven.com/a/metal_trash_can",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "utility_box": {
+      "file": "assets/models/utility_box.glb",
+      "role": "static",
+      "triangles": 2000,
+      "size": [
+        0.52,
+        1.1203,
+        0.432
+      ],
+      "materials": [
+        "utility_box_01"
+      ],
+      "bytes": 124176,
+      "license": {
+        "name": "Utility Box 01",
+        "authors": [
+          "James Ray Cock"
+        ],
+        "url": "https://polyhaven.com/a/utility_box_01",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "manhole": {
+      "file": "assets/models/manhole.glb",
+      "role": "static",
+      "triangles": 1423,
+      "size": [
+        0.6908,
+        0.0676,
+        0.6908
+      ],
+      "materials": [
+        "water_manhole_cover"
+      ],
+      "bytes": 120620,
+      "license": {
+        "name": "Water Manhole Cover",
+        "authors": [
+          "Raunox"
+        ],
+        "url": "https://polyhaven.com/a/water_manhole_cover",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "road_barrier": {
+      "file": "assets/models/road_barrier.glb",
+      "role": "static",
+      "triangles": 2500,
+      "size": [
+        1.5629,
+        1.1111,
+        0.4418
+      ],
+      "materials": [
+        "concrete_road_barrier_02"
+      ],
+      "bytes": 140572,
+      "license": {
+        "name": "Concrete Road Barrier 02",
+        "authors": [
+          "Amal Kumar"
+        ],
+        "url": "https://polyhaven.com/a/concrete_road_barrier_02",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "fire_hydrant": {
+      "file": "assets/models/fire_hydrant.glb",
+      "role": "static",
+      "triangles": 2814,
+      "size": [
+        0.2728,
+        0.7992,
+        0.3173
+      ],
+      "materials": [
+        "fire_hydrant"
+      ],
+      "bytes": 145768,
+      "license": {
+        "name": "Fire Hydrant",
+        "authors": [
+          "Gonçalo Felício"
+        ],
+        "url": "https://polyhaven.com/a/fire_hydrant",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "aircon_unit": {
+      "file": "assets/models/aircon_unit.glb",
+      "role": "static",
+      "triangles": 2523,
+      "size": [
+        0.7972,
+        0.9279,
+        0.3742
+      ],
+      "materials": [
+        "exterior_aircon_unit_01",
+        "exterior_aircon_unit_02"
+      ],
+      "bytes": 213752,
+      "license": {
+        "name": "Exterior Aircon Unit",
+        "authors": [
+          "Monsta3D"
+        ],
+        "url": "https://polyhaven.com/a/exterior_aircon_unit",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "boot": {
+      "file": "assets/models/boot.glb",
+      "role": "tool",
+      "triangles": 2500,
+      "size": [
+        0.0905,
+        0.3723,
+        0.2658
+      ],
+      "materials": [
+        "rubber_boots"
+      ],
+      "bytes": 77456,
+      "license": {
+        "name": "Rubber Boots",
+        "authors": [
+          "L"
+        ],
+        "url": "https://polyhaven.com/a/rubber_boots",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "desk_lamp": {
+      "file": "assets/models/desk_lamp.glb",
+      "role": "prop",
+      "triangles": 2901,
+      "size": [
+        0.1826,
+        0.3641,
+        0.2621
+      ],
+      "materials": [
+        "industrial_pipe_lamp",
+        "industrial_pipe_lamp_glass"
+      ],
+      "bytes": 169876,
+      "license": {
+        "name": "Industrial Pipe Lamp",
+        "authors": [
+          "Mateusz Sadek"
+        ],
+        "url": "https://polyhaven.com/a/industrial_pipe_lamp",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "trashbag": {
+      "file": "assets/models/trashbag.glb",
+      "role": "static",
+      "triangles": 2428,
+      "size": [
+        0.5281,
+        0.575,
+        0.4629
+      ],
+      "materials": [
+        "trashbag"
+      ],
+      "bytes": 114896,
+      "license": {
+        "name": "Trashbag",
+        "authors": [
+          "Benny Weimer"
+        ],
+        "url": "https://polyhaven.com/a/trashbag",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    }
+  },
+  "textures": {
+    "rubber_floor": {
+      "base": "assets/textures/rubber_floor",
+      "bytes": 12442,
+      "license": {
+        "name": "Rubber Tiles",
+        "authors": [
+          "Amal Kumar"
+        ],
+        "url": "https://polyhaven.com/a/rubber_tiles",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "room_wall": {
+      "base": "assets/textures/room_wall",
+      "bytes": 82550,
+      "license": {
+        "name": "Concrete Wall 004",
+        "authors": [
+          "Dario Barresi",
+          "Charlotte Baglioni"
+        ],
+        "url": "https://polyhaven.com/a/concrete_wall_004",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "room_ceiling": {
+      "base": "assets/textures/room_ceiling",
+      "bytes": 25362,
+      "license": {
+        "name": "Concrete Floor Worn 001",
+        "authors": [
+          "Dimitrios Savva",
+          "Rico Cilliers"
+        ],
+        "url": "https://polyhaven.com/a/concrete_floor_worn_001",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "asphalt": {
+      "base": "assets/textures/asphalt",
+      "bytes": 200974,
+      "license": {
+        "name": "Asphalt 02",
+        "authors": [
+          "Rob Tuytel"
+        ],
+        "url": "https://polyhaven.com/a/asphalt_02",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "sidewalk": {
+      "base": "assets/textures/sidewalk",
+      "bytes": 96092,
+      "license": {
+        "name": "Concrete Pavers",
+        "authors": [
+          "Amal Kumar"
+        ],
+        "url": "https://polyhaven.com/a/concrete_pavers",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "facade_rage": {
+      "base": "assets/textures/facade_rage",
+      "bytes": 170488,
+      "license": {
+        "name": "Factory Brick",
+        "authors": [
+          "Rob Tuytel"
+        ],
+        "url": "https://polyhaven.com/a/factory_brick",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "facade_tools": {
+      "base": "assets/textures/facade_tools",
+      "bytes": 198136,
+      "license": {
+        "name": "Dark Brick Wall",
+        "authors": [
+          "Dario Barresi",
+          "Dimitrios Savva"
+        ],
+        "url": "https://polyhaven.com/a/dark_brick_wall",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "facade_objects": {
+      "base": "assets/textures/facade_objects",
+      "bytes": 58336,
+      "license": {
+        "name": "Exterior Wall Cladding 03",
+        "authors": [
+          "Charlotte Baglioni"
+        ],
+        "url": "https://polyhaven.com/a/exterior_wall_cladding_03",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "metal_plate": {
+      "base": "assets/textures/metal_plate",
+      "bytes": 114530,
+      "license": {
+        "name": "Metal Plate",
+        "authors": [
+          "Rob Tuytel"
+        ],
+        "url": "https://polyhaven.com/a/metal_plate",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "alley_wall": {
+      "base": "assets/textures/alley_wall",
+      "bytes": 24364,
+      "license": {
+        "name": "Concrete Wall 008",
+        "authors": [
+          "Dario Barresi",
+          "Charlotte Baglioni"
+        ],
+        "url": "https://polyhaven.com/a/concrete_wall_008",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    },
+    "dumpster_metal": {
+      "base": "assets/textures/dumpster_metal",
+      "bytes": 13368,
+      "license": {
+        "name": "Green Metal Rust",
+        "authors": [
+          "Rob Tuytel"
+        ],
+        "url": "https://polyhaven.com/a/green_metal_rust",
+        "site": "Poly Haven",
+        "license": "CC0 1.0"
+      }
+    }
+  }
+}

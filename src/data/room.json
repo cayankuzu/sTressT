@@ -1,0 +1,22 @@
+{
+  "$comment": "Starter objects of a new game. Positions are room-local (metres): x = left/right, y = up, z = towards the door (+3 is the door wall). rotationY in degrees. They are created once; once broken they are gone like anything else.",
+  "starterLayout": [
+    { "instanceId": "starter_side_table", "definitionId": "side_table", "position": [2.1, 0, -1.6], "rotationY": 0 },
+    { "instanceId": "starter_cup", "definitionId": "tea_cup", "position": [1.98, 0.551, -1.68], "rotationY": 30 },
+    { "instanceId": "starter_bottle", "definitionId": "wine_bottle", "position": [2.23, 0.551, -1.48], "rotationY": 0 },
+    { "instanceId": "starter_chair", "definitionId": "wooden_chair", "position": [-1.6, 0, -1.1], "rotationY": 25 },
+    { "instanceId": "starter_vase", "definitionId": "ceramic_vase_01", "position": [0.3, 0, -2.0], "rotationY": 0 },
+    { "instanceId": "starter_box", "definitionId": "cardboard_box", "position": [-2.6, 0, 0.7], "rotationY": -15 }
+  ],
+  "$streetComment": "One-time free finds on the street (world coordinates, metres). Claimed the first time they are picked up; never respawn.",
+  "foundItems": [
+    { "id": "found_road_chair", "definitionId": "wooden_chair", "position": [6.6, 0, 4.9], "rotationY": -30 },
+    { "id": "found_road_box", "definitionId": "cardboard_box", "position": [3.2, 0, -4.3], "rotationY": 12 },
+    { "id": "found_road_bottle", "definitionId": "wine_bottle", "position": [-7.6, 0, 5.4], "rotationY": 0 },
+    { "id": "found_road_lamp", "definitionId": "desk_lamp", "position": [8.2, 0, 5.7], "rotationY": 200 },
+    { "id": "found_bin_crate", "definitionId": "wooden_crate", "position": [-3.9, 0, 5.75], "rotationY": 4 },
+    { "id": "found_bin_box", "definitionId": "cardboard_box", "position": [0.5, 0, 5.85], "rotationY": 22 },
+    { "id": "found_bin_bottle", "definitionId": "champagne_bottle", "position": [0.95, 0, 5.3], "rotationY": 0 },
+    { "id": "found_bin_chair", "definitionId": "plastic_chair", "position": [-5.6, 0, 4.7], "rotationY": 140 }
+  ]
+}

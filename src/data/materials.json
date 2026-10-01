@@ -1,0 +1,65 @@
+{
+  "ceramic": {
+    "brittleness": 0.75, "minEnergy": 5, "damageSpread": 0.035, "fragments": [6, 12], "chipEnergy": 40,
+    "deform": 0, "maxDeform": 0, "cracks": true, "pattern": "radial",
+    "friction": 0.6, "restitution": 0.08, "interiorColor": "#dcd3c6",
+    "sounds": { "light": "impactPlate_light", "medium": "impactPlate_medium", "heavy": "impactPlate_heavy" },
+    "breakSynth": "ceramic"
+  },
+  "glass": {
+    "brittleness": 0.9, "minEnergy": 3, "damageSpread": 0.05, "fragments": [8, 16], "chipEnergy": 0,
+    "deform": 0, "maxDeform": 0, "cracks": true, "pattern": "shatter",
+    "friction": 0.4, "restitution": 0.1, "interiorColor": "#cfe3e0",
+    "sounds": { "light": "impactGlass_light", "medium": "impactGlass_medium", "heavy": "impactGlass_heavy" },
+    "breakSynth": "glass"
+  },
+  "wood": {
+    "brittleness": 0.25, "minEnergy": 12, "damageSpread": 0.03, "fragments": [3, 7], "chipEnergy": 90,
+    "deform": 0.0004, "maxDeform": 0.02, "cracks": false, "pattern": "splinter",
+    "friction": 0.7, "restitution": 0.12, "interiorColor": "#c9a877",
+    "sounds": { "light": "impactWood_light", "medium": "impactWood_medium", "heavy": "impactWood_heavy" },
+    "breakSynth": "wood"
+  },
+  "plastic": {
+    "brittleness": 0.35, "minEnergy": 8, "damageSpread": 0.035, "fragments": [3, 6], "chipEnergy": 70,
+    "deform": 0.0006, "maxDeform": 0.035, "cracks": false, "pattern": "chunk",
+    "friction": 0.55, "restitution": 0.25, "interiorColor": "#e6e1d8",
+    "sounds": { "light": "impactGeneric_light", "medium": "impactPlank_medium", "heavy": "impactSoft_heavy" },
+    "breakSynth": "plastic"
+  },
+  "electronic": {
+    "brittleness": 0.5, "minEnergy": 10, "damageSpread": 0.04, "fragments": [5, 10], "chipEnergy": 60,
+    "deform": 0.0003, "maxDeform": 0.02, "cracks": true, "pattern": "chunk",
+    "friction": 0.55, "restitution": 0.1, "interiorColor": "#3a3d40",
+    "sounds": { "light": "impactGeneric_light", "medium": "impactTin_medium", "heavy": "impactMetal_medium" },
+    "breakSynth": "plastic"
+  },
+  "metal": {
+    "brittleness": 0.1, "minEnergy": 40, "damageSpread": 0.05, "fragments": [2, 4], "chipEnergy": 0,
+    "deform": 0.0008, "maxDeform": 0.08, "cracks": false, "pattern": "tear",
+    "friction": 0.5, "restitution": 0.15, "interiorColor": "#7c7f83",
+    "sounds": { "light": "impactMetal_light", "medium": "impactMetal_medium", "heavy": "impactMetal_heavy" },
+    "breakSynth": "metal"
+  },
+  "cardboard": {
+    "brittleness": 0.05, "minEnergy": 2, "damageSpread": 0.06, "fragments": [2, 4], "chipEnergy": 25,
+    "deform": 0.0015, "maxDeform": 0.08, "cracks": false, "pattern": "tear",
+    "friction": 0.8, "restitution": 0.05, "interiorColor": "#a8845a",
+    "sounds": { "light": "impactSoft_medium", "medium": "impactSoft_medium", "heavy": "impactSoft_heavy" },
+    "breakSynth": "cardboard"
+  },
+  "rubber": {
+    "brittleness": 0, "minEnergy": 80, "damageSpread": 0.05, "fragments": [2, 3], "chipEnergy": 0,
+    "deform": 0, "maxDeform": 0, "cracks": false, "pattern": "chunk",
+    "friction": 0.95, "restitution": 0.6, "interiorColor": "#222222",
+    "sounds": { "light": "impactSoft_medium", "medium": "impactSoft_medium", "heavy": "impactSoft_heavy" },
+    "breakSynth": "none"
+  },
+  "stone": {
+    "brittleness": 0.6, "minEnergy": 15, "damageSpread": 0.03, "fragments": [4, 9], "chipEnergy": 60,
+    "deform": 0, "maxDeform": 0, "cracks": true, "pattern": "chunk",
+    "friction": 0.7, "restitution": 0.05, "interiorColor": "#c8c3ba",
+    "sounds": { "light": "impactMining", "medium": "impactMining", "heavy": "impactMining" },
+    "breakSynth": "stone"
+  }
+}

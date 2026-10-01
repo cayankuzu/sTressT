@@ -13,7 +13,7 @@ npm test        # unit tests only (vitest)
 | `src/destruction/damage.test.ts` | Damage model (angle, concentration, thresholds, chain-reaction falloff, no NaN/Infinity) and stage rules (each stage exactly once, never backwards) |
 | `src/destruction/debrisRules.test.ts` | Major/minor classification within budget and world cap, the debris state machine (disposed is final), refracture limits and heavy pieces always breakable |
 | `src/destruction/geometry/geometry.test.ts` | Slicing keeps area and winding, cut points are bit-identical, islands, deterministic fracture for every pattern, bodies with many detail islands still split, chipping, hull tops and bases kept to four corners |
-| `src/economy/economy.test.ts` | Ledger idempotency, purchases and deliveries, tool pick-up, safety box, one-time street finds, storage, sessions, ledger pruning, refusals, no input mutation, invariants |
+| `src/economy/economy.test.ts` | Ledger idempotency, purchases and deliveries, tool pick-up, safety box, one-time street finds, old saves' storage delivered once, sessions, ledger pruning, refusals, no input mutation, invariants |
 | `src/economy/simulate.test.ts` | Economy pacing for bad / average / good players; nobody gets stuck |
 | `src/session/session.test.ts` | Exactly-once rewards, combo only across different objects, one clear bonus per session, one-hit and chain-reaction bonuses |
 | `src/destruction/geometry/fracture.bench.test.ts` | Fracture timings on real models; skipped unless `BENCH=1` |
@@ -31,7 +31,12 @@ await qa.objectAudit(["mirror"]);  // or a few
 await qa.controllerAudit();        // speeds, jump, landing, corners, leaving the map
 await qa.inputAudit();             // input spam and interrupted actions
 await qa.playthrough();            // find, carry, arrange, break, clean up, shop, deliver, save, load
+await qa.feedbackAudit();          // every tool swings in the hands, kick boot, container popup and note
 ```
+
+Every audit plays in a profile of its own named "QA" (created when missing) and never touches a
+player's slots. The pane is shared with the player: a click that captures and releases the mouse
+pauses the game, so the playthrough reports such a run as `INVALID` instead of a result.
 
 Run long audits in batches of about 8 objects (the browser tool times out after 45 s). Results and
 the bug log of the last pass are in [AUDIT.md](AUDIT.md).
@@ -74,7 +79,7 @@ Results of the last full pass (Chromium, Windows 11, Intel UHD, dev and producti
 | Save safety | Corrupt primary save → backup loaded; profiles isolated; legacy save imported into slot 1 | Pass |
 | New game | All 14 starter objects stand upright and asleep | Pass |
 | Modes | TAB selector; break refused outside, in the doorway or with nothing breakable; arrange refused during a break; door locked during a break | Pass |
-| Arrange | Ghost never pushes neighbours; objects on top travel with it (table with cup and bottle, cabinet with TV); vase on a box, TV on a cabinet, cup on a chair; nothing moves faster than 0.25 m/s after a commit; invalid spots cannot be committed; storage out and back in | Pass |
+| Arrange | Ghost never pushes neighbours; objects on top travel with it (table with cup and bottle, cabinet with TV); vase on a box, TV on a cabinet, cup on a chair; nothing moves faster than 0.25 m/s after a commit; invalid spots cannot be committed | Pass |
 | Stability | Every starter object, street find, bottle and cup on four spots of the table: woken, all stay standing (≤ 2.4°) | Pass |
 | Pushing | Walking and running into vase, chair, box and table in arrange mode: nudged ≤ 0.4 m, nothing launched, cup and bottle on the table stay up; carried chair swept past a vase: vase ≤ 0.16 m/s | Pass |
 | Breaking | Stages, credits, combo, marks on every hit, re-fracture keeps cleanup value, per-object piece budget | Pass |

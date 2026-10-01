@@ -1,6 +1,6 @@
 import { MATERIAL_TYPES, type MaterialType, type ObjectOrigin } from "../data/types";
 import { OBJECTS, ROOM, STARTER_TOOL_ID, TOOLS } from "../data/catalog";
-import { cloneProgress, defaultProgress, EMPTY_STATS, type ProgressState, type Statistics } from "../economy/state";
+import { cloneProgress, defaultProgress, EMPTY_STATS, type ProgressState, type ReturningObject, type Statistics } from "../economy/state";
 import { roomToWorld } from "../world/layout";
 
 /**
@@ -80,6 +80,12 @@ export type SaveData = {
   progress: ProgressState;
   objects: ObjectRecord[];
   debris: DebrisRecord[];
+  /**
+   * Objects from an older save with no place in the world yet (the former storage, or a v1/v2
+   * object inventory). The game delivers them to the street drop zone on load; a save written
+   * afterwards has them in `objects`.
+   */
+  returning?: ReturningObject[];
 };
 
 /** Small listing data shown on save cards (stored next to the save, read without loading it). */
@@ -99,7 +105,7 @@ export function summarize(save: SaveData): SlotSummary {
     name: save.name,
     credits: save.progress.credits,
     tools: save.progress.ownedTools.length + save.progress.toolDeliveries.length,
-    objects: save.objects.length + save.progress.storage.length,
+    objects: save.objects.length + (save.returning?.length ?? 0),
     playtimeSeconds: Math.floor(save.playtimeSeconds),
     updatedAt: save.updatedAt,
   };
@@ -309,13 +315,6 @@ function progress(v: unknown): ProgressState {
       deliveries.push({ id: d.id, toolId: d.toolId });
     }
   }
-  const storage: ProgressState["storage"] = [];
-  if (Array.isArray(v.storage)) {
-    for (const s of v.storage) {
-      if (!isRecord(s) || !isId(s.id) || typeof s.definitionId !== "string" || !OBJECTS[s.definitionId] || storage.some((x) => x.id === s.id)) continue;
-      storage.push({ id: s.id, definitionId: s.definitionId, origin: ORIGINS.has(s.origin as string) ? (s.origin as ObjectOrigin) : "purchased" });
-    }
-  }
   const strings = (a: unknown): string[] => (Array.isArray(a) ? [...new Set(a.filter((x): x is string => typeof x === "string" && x.length < 120))] : []);
   const counters = isRecord(v.counters) ? v.counters : {};
   const flags: Record<string, boolean> = {};
@@ -325,7 +324,6 @@ function progress(v: unknown): ProgressState {
     ownedTools,
     equippedToolId: equipped,
     toolDeliveries: deliveries,
-    storage,
     claimedFoundItems: strings(v.claimedFoundItems).filter((id) => ROOM.foundItems.some((f) => f.id === id)),
     rewardLedger: strings(v.rewardLedger),
     counters: { object: count(counters.object), delivery: count(counters.delivery), session: count(counters.session) },
@@ -366,10 +364,10 @@ export function validateSaveData(input: unknown): SaveData | null {
     }
   }
   const p = progress(input.progress);
-  // Nothing may exist twice: an id in storage cannot also stand in the world.
-  p.storage = p.storage.filter((s) => !ids.has(s.id));
+  // Nothing may exist twice: an object already standing in the world is not delivered again.
+  const returning = returningObjects([input.returning, isRecord(input.progress) ? input.progress.storage : undefined], ids);
   // Counters must stay ahead of every id already handed out, or a new purchase could reuse one.
-  for (const id of [...ids, ...p.storage.map((s) => s.id)]) {
+  for (const id of [...ids, ...returning.map((s) => s.id)]) {
     const m = /^obj_(\d+)/.exec(id);
     if (m) p.counters.object = Math.max(p.counters.object, Number(m[1]));
   }
@@ -388,13 +386,28 @@ export function validateSaveData(input: unknown): SaveData | null {
     progress: p,
     objects,
     debris,
+    ...(returning.length > 0 ? { returning } : {}),
   };
+}
+
+/** Objects waiting for delivery, from any of `lists` (the legacy `progress.storage` included). */
+function returningObjects(lists: unknown[], taken: ReadonlySet<string>): ReturningObject[] {
+  const out: ReturningObject[] = [];
+  for (const list of lists) {
+    if (!Array.isArray(list)) continue;
+    for (const s of list) {
+      if (!isRecord(s) || !isId(s.id) || typeof s.definitionId !== "string" || !OBJECTS[s.definitionId]) continue;
+      if (taken.has(s.id) || out.some((x) => x.id === s.id)) continue;
+      out.push({ id: s.id, definitionId: s.definitionId, origin: ORIGINS.has(s.origin as string) ? (s.origin as ObjectOrigin) : "purchased" });
+    }
+  }
+  return out;
 }
 
 /**
  * Imports a v1/v2 single-save document (the old localStorage format) as a v3 save: money, tools
- * and statistics carry over, the old room layout becomes intact objects, the old inventory goes
- * into storage.
+ * and statistics carry over, the old room layout becomes intact objects, the old inventory is
+ * delivered to the street drop zone.
  */
 export function migrateLegacy(raw: unknown, profileId: string, slot: number, saveId: string, name: string): SaveData | null {
   if (!isRecord(raw)) return null;
@@ -431,13 +444,15 @@ export function migrateLegacy(raw: unknown, profileId: string, slot: number, sav
     save.objects = objects;
   }
   if (isRecord(raw.objectInventory)) {
+    const returning: ReturningObject[] = [];
     for (const [id, n] of Object.entries(raw.objectInventory)) {
       if (!OBJECTS[id]) continue;
       for (let i = 0; i < Math.min(count(n), 20); i++) {
         p.counters.object += 1;
-        p.storage.push({ id: `obj_${String(p.counters.object).padStart(6, "0")}`, definitionId: id, origin: "purchased" });
+        returning.push({ id: `obj_${String(p.counters.object).padStart(6, "0")}`, definitionId: id, origin: "purchased" });
       }
     }
+    save.returning = returning;
   }
   save.progress = p;
   return validateSaveData(save);

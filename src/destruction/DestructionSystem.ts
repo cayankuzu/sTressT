@@ -40,6 +40,7 @@ const SPAWN_BUDGET_MS = 3;
 const WORLD_GENERATION = -1;
 const SOUND_COOLDOWN = 0.07;
 const WORLD_BOX = new Box3(new Vector3(-21, -50, -15), new Vector3(21, 30, 9));
+const binPoint = new Vector3();
 /**
  * Settling of bodies put down at rest: gravity is held for `holdSteps` (contacts form first), then
  * the body is damped (no start-up rocking) until it sleeps or `maxSteps` pass.
@@ -76,6 +77,10 @@ export class DestructionSystem {
   /** An object fell out of the world (it is put back by the game, never silently deleted). */
   onObjectLost: (obj: Destructible) => void = () => undefined;
   onObjectGone: (obj: Destructible) => void = () => undefined;
+  /** A whole object came to rest in the street container (only pieces are taken). */
+  onObjectInBin: (obj: Destructible) => void = () => undefined;
+  /** Seconds each object has been resting inside the container. */
+  private readonly binTime = new WeakMap<Destructible, number>();
 
   /**
    * Bodies just placed at rest (new game, load, delivery, arrange commit). They are created awake so
@@ -496,6 +501,7 @@ export class DestructionSystem {
       obj.afterStep();
       // Something fell out of the world: the game puts it back (it is still the player's).
       if (obj.alive && (obj.currPos.y < GAME.debris.lostBelowY || !WORLD_BOX.containsPoint(obj.currPos))) this.onObjectLost(obj);
+      else this.checkObjectInBin(obj, dt);
     }
     events.drainContactForceEvents((event) => {
       this.handleContact(event.collider1(), event.collider2(), event.totalForceMagnitude() * dt);
@@ -586,6 +592,23 @@ export class DestructionSystem {
       });
     }
     return quiet;
+  }
+
+  /** Tells the game once when a whole object settles in the container, so the player knows why nothing happens. */
+  private checkObjectInBin(obj: Destructible, dt: number): void {
+    const volume = this.disposalVolume;
+    const v = obj.body?.linvel();
+    // An object's origin is at its base: test the middle of its bounds instead.
+    const middle = binPoint.set(...obj.template.center).applyQuaternion(obj.currQuat).add(obj.currPos);
+    if (!volume || !v || !obj.alive || obj.held || !volume.containsPoint(middle)) {
+      this.binTime.delete(obj);
+      return;
+    }
+    if (Math.hypot(v.x, v.y, v.z) >= GAME.disposal.settleSpeed) return;
+    const before = this.binTime.get(obj) ?? 0;
+    const after = before + dt;
+    this.binTime.set(obj, after);
+    if (before < GAME.disposal.settleSeconds && after >= GAME.disposal.settleSeconds) this.onObjectInBin(obj);
   }
 
   /** Street container disposal and lost-piece protection for collectible pieces. */

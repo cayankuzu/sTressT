@@ -200,3 +200,21 @@ gömüyordu; yerine sönümleme kondu. Küçük adımları yok saymak da yürüm
 | Bilinen, kabul edilen | 3 (bölüm 5) |
 
 P0: 0 · P1: 0 açık · P2: 0 açık.
+
+## 9. Sürüm 0.1.1: kullanıcı raporları ve ikinci tarama
+
+Bu bölümdeki sayılar, yukarıdaki tablolardan güncel olanlardır. Depo kaldırıldığı için ekran sayısı
+11'e, girdi eylemi sayısı 26'ya indi.
+
+| ID | Öncelik | Hata | Kök neden | Düzeltme | Doğrulama |
+| --- | --- | --- | --- | --- | --- |
+| B17 | **P1** | Yumruk dışındaki aletler elde hiç sallanmıyordu. Vuruş gerçekleşiyor ama alet dinlenme pozunda kalıyordu (kullanıcı raporu) | Yumrukların sağ/sol sırası (`leftTurn`) bütün aletlere uygulanıyordu. Sıra yalnız yumruklarda ilerlediği için diğer aletlerde hep "sol elin sırası"nda kalınıyor, sağ el dinlenme pozunu çiziyordu. Vuruş geri tepmesi de bu yüzden kapalıydı | Sıra yalnız yumruklarda uygulanıyor | `qa.feedbackAudit()`: 7 aletin hepsi savuruşta 0.22–0.37 m hareket edip dönüyor; yumruklar sağ/sol sırayla |
+| B18 | P2 | Konteynere atılan parça para kazandırıyordu ama hiçbir geri bildirim yoktu (kullanıcı raporu) | `payout.cleanup` etiketi tanımlıydı ama hiçbir yere bağlanmamıştı | Konteynerin üstünde "+N CR · TEMİZLİK" balonu ve ödül sesi; birlikte düşen parçalar tek balonda toplanıyor | 15 parça → tek balonda +94 |
+| B19 | P3 | Depo (DEL / I) anlaşılmıyordu. DEL yalnız DÜZENLE modunda, odada, elde eşya yokken ve hasarsız bir eşyaya bakarken çalışıyor, başka her durumda sessiz kalıyordu (kullanıcı raporu) | Fiziksel teslimata geçildikten sonra işlevsiz kalan eski envanter. Eşyayı korumak için sokağa taşımak zaten yetiyor | Kullanıcı kararıyla depo kaldırıldı. Eski kayıtlarda depoda duran eşyalar, kayıt yüklenince bir kez sokaktaki teslim alanına gelir | Birim testi; tarayıcıda depolu eski kayıt: kutu bir kez geldi, ikinci yüklemede tekrar gelmedi |
+| B20 | P3 | Konteynere sağlam eşya atılınca hiçbir şey olmuyordu ve nedeni söylenmiyordu (yeni bulundu) | Konteyner yalnız parçaları kabul ediyor | "{eşya} sağlam: konteyner yalnızca kırık parçaları alır. Önce kır." notu. Eşyanın merkezi esas alınıyor, çünkü tabanı konteyner zemininin hemen altında kalabiliyor | `qa.feedbackAudit()` |
+| B21 | P2 (test aracı) | Test aracı o an açık olan profilin 3. yuvasına yazıyordu; oyuncunun kaydının üzerine yazabilirdi (yeni bulundu) | Profil seçilmeden `newGame(2)` çağrılıyordu | Araç hep kendi "QA" profilinde oynuyor. Panelde fare yakalanıp bırakılınca oyun duraklarsa oynanış sonucu `INVALID` olarak işaretleniyor | Kod incelemesi; 5180'deki "as" profiline dokunulmadı |
+
+Test turu: 66 birim testi; `feedbackAudit`, `inputAudit` ve `controllerAudit` geçti; `playthrough`
+11 turun son 7'sinde art arda geçti. İlk 4 turun 2'si, bazı vuruşlar boşa gittiği için yarım kaldı;
+bu sonra tekrarlanmadı. Muhtemel neden, panelin oyuncuyla paylaşılması ve oyunun duraklamasıydı; artık bu
+durum ölçülüyor ve raporlanıyor.

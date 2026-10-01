@@ -92,6 +92,7 @@ export class UI {
         h("div", { class: "menu" }, contWrap, button(t("menu.newGame"), handlers.onNewGame, info.continueInfo ? "ghost" : "primary"), button(t("menu.savedGames"), handlers.onSavedGames), button(t("menu.settings"), handlers.onSettings)),
         info.storageWarning ? h("p", { class: "notice-warn", text: t("app.noStorage") }) : null,
         info.noMouse ? h("p", { class: "notice-warn", text: t("app.noMouse") }) : controlsHint(),
+        h("span", { class: "app-version", text: `v${__APP_VERSION__}` }),
       ),
     );
   }

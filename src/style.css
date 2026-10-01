@@ -909,30 +909,6 @@ body,
   justify-content: center;
 }
 
-/* ---------- inventory ---------- */
-.inv-grid {
-  display: grid;
-  gap: 6px;
-  max-height: 52vh;
-  overflow-y: auto;
-}
-
-.inv-item {
-  display: grid;
-  grid-template-columns: 48px 1fr auto auto;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 6px 8px;
-  border-radius: var(--radius);
-  background: rgb(255 255 255 / 4%);
-  font-size: var(--fs-sm);
-}
-
-.inv-item .btn {
-  padding: 8px 12px;
-  font-size: var(--fs-xs);
-}
-
 .notice-warn {
   max-width: 420px;
   margin-top: var(--space-5);
@@ -944,6 +920,15 @@ body,
 /* ---------- main menu, profiles, save slots ---------- */
 .main-menu .menu {
   min-width: 280px;
+}
+
+.app-version {
+  position: absolute;
+  right: calc(var(--space-4) + env(safe-area-inset-right, 0px));
+  bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+  font-size: var(--fs-xs);
+  letter-spacing: 0.12em;
+  color: var(--muted);
 }
 
 .menu-continue {

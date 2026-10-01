@@ -19,12 +19,12 @@ main.ts ── boot: profiles (localStorage), language, quality, renderer, physi
          ├── audio/        AudioManager (WebAudio, voice budget)
          ├── fx/           Particles
          ├── engine/       renderer, physics, collider debug view
-         └── ui/           i18n (TR/EN), HUD, menus, shops, storage, debug overlay
+         └── ui/           i18n (TR/EN), HUD, menus, shops, debug overlay
 ```
 
 ## States and modes
 
-- **State** (`title | playing | paused | menu`): every overlay (pause, shop, storage, confirm) is
+- **State** (`title | playing | paused | menu`): every overlay (pause, shop, confirm) is
   `menu` or `paused`, which freezes physics, input and the session. Physics keeps running behind
   the title screen as a live backdrop.
 - **Mode** (`arrange | break | cleanup`), picked with the TAB selector. `modeBlock()` says why a

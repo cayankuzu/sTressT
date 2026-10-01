@@ -14,7 +14,7 @@ export type SessionStats = {
   toolsUsed: Set<string>;
 };
 
-export type Payout = { amount: number; label: "" | "one_hit" | "chain" | "clear"; name: string; point?: [number, number, number] };
+export type Payout = { amount: number; label: "" | "one_hit" | "chain" | "clear" | "cleanup"; name: string; point?: [number, number, number] };
 
 export type SessionHooks = {
   /** Pays through the economy's idempotent ledger; false = this key was already paid. */

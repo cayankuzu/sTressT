@@ -160,9 +160,11 @@ tear (cardboard, sheet metal), chunk (stone, plastic, electronics).
 - **Room clear**: when the stress meter is empty, +10% of the value destroyed in that session.
 - Bought objects are consumed when broken: income comes from buying, breaking and cleaning again.
 - Street finds (eight objects around the street) are free; each can be claimed once.
-- **Safety net**: with no credits for the cheapest object and nothing breakable left (in the room or
-  in storage), the Object Store gives a free cardboard box. Nobody can get stuck.
-- Room capacity: 40 objects. Rubber items and the metal barrel are indestructible props.
+- **Safety net**: with no credits for the cheapest object and nothing breakable left, the Object
+  Store gives a free cardboard box. Nobody can get stuck.
+- Rubber items and the metal barrel are indestructible props.
+- Cleaning pays as each piece settles in the container: a "+N · TEMİZLİK" popup above it (pieces
+  landing together share one). A whole object thrown in stays there, with a note to break it first.
 
 ## Shops and deliveries
 
@@ -183,9 +185,10 @@ click picks, right click or a few seconds closes it.
   anything, and whatever stands on it (a cup on a table, a TV on a cabinet) travels with it. It
   snaps onto the surface below (magnet), turns with Q/E (Shift: free rotation) and is checked with
   its real collision shape for overlap, plus support, the room walls, the doorway and the player.
-  Left click commits, right click cancels. Delete sends an intact object to storage; I opens
-  storage. Walking into things only nudges them, and a carried object bumps into others without
-  shoving them: arranging never knocks the room over.
+  Left click commits, right click cancels. An object you want to keep safe from a break can simply
+  be carried out to the street (there is no separate storage). Walking into things only nudges
+  them, and a carried object bumps into others without shoving them: arranging never knocks the
+  room over.
 - **KIR / BREAK**: only inside the room, away from the doorway, with something breakable present.
   The door locks; damage, rewards, stress meter and combo are active. Arrange is not available
   until the break ends.
@@ -200,7 +203,7 @@ Walking into objects pushes them like a person would: horizontally, slower than 
 
 - Local profiles (up to 5 per browser), each with 3 save slots and its own settings. A save is keyed
   `installation/profile/slot` in IndexedDB; profile metadata lives in localStorage.
-- A save holds credits, tools, deliveries, storage, every object (pose, damage, marks, parts), every
+- A save holds credits, tools, deliveries, every object (pose, damage, marks, parts), every
   major piece, claimed finds, the reward ledger, statistics, tutorial flags and playtime.
 - Autosave after changes and every 60 s; manual save from the pause menu. Each write keeps the
   previous good save as a backup, both with a checksum: a corrupt save falls back to the backup.

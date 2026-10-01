@@ -51,8 +51,6 @@ detected, and can be changed in Settings).
 | TAB | Mode selector: 1 DÜZENLE (arrange), 2 KIR (break), 3 TEMİZLE (cleanup) |
 | 1–9 / mouse wheel | Switch tools |
 | Q / E (Shift: free) | Rotate while placing |
-| Delete | Send an intact object to storage (arrange) |
-| I | Storage: place stored objects (arrange) |
 | Esc / P | Pause: resume, save, end break, settings, main menu |
 | ` or F1, F2 | Debug overlay and collider view (dev builds or `?debug=1`) |
 
@@ -98,7 +96,7 @@ src/
   player/       movement, tools, kick, grab/throw, arrange mode, viewmodel, camera shake
   save/         save schema, migrations, slots with backup, profiles, settings
   session/      reward bookkeeping for one break session
-  ui/           i18n (TR/EN), DOM overlays, HUD, shops, storage
+  ui/           i18n (TR/EN), DOM overlays, HUD, shops
   world/        street, rage room, trash container, tool bench, lighting, signs, props
 scripts/assets/ asset download/processing pipeline and its manifest
 public/assets/  processed models, textures and sounds (generated)
@@ -110,6 +108,8 @@ More detail:
 - [ARCHITECTURE.md](ARCHITECTURE.md): how the code fits together
 - [PERFORMANCE.md](PERFORMANCE.md): budgets and the techniques used to meet them
 - [TESTING.md](TESTING.md): automated tests, the dev handle and the QA checklist
+- [CHANGELOG.md](CHANGELOG.md): release notes (Turkish); the running version is shown on the main menu
+- [AUDIT.md](AUDIT.md): the system audit and bug log (Turkish)
 - [ASSET_LICENSES.md](ASSET_LICENSES.md): every third-party asset with its source and license
 
 ## Assets

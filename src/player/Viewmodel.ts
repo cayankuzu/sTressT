@@ -297,12 +297,14 @@ export class Viewmodel {
     this.pivot.visible = this.lower < 0.98;
     this.offhand.visible = this.lower < 0.98;
 
-    const right = this.leftTurn ? this.rest : this.shown;
-    this.holder.position.set(this.hand.x + right.pos.x + bx, this.hand.y + right.pos.y + by + ly, this.hand.z + right.pos.z + lz + (this.leftTurn ? 0 : recoil));
+    // Only fists take turns: every other tool swings in the right hand every time.
+    const leftSwings = this.leftHolder.visible && this.leftTurn;
+    const right = leftSwings ? this.rest : this.shown;
+    this.holder.position.set(this.hand.x + right.pos.x + bx, this.hand.y + right.pos.y + by + ly, this.hand.z + right.pos.z + lz + (leftSwings ? 0 : recoil));
     this.holder.quaternion.copy(this.lowerQuat).multiply(right.rot);
     if (this.leftHolder.visible) {
       const left = this.mirrored;
-      if (this.leftTurn) {
+      if (leftSwings) {
         left.pos.set(-this.shown.pos.x, this.shown.pos.y, this.shown.pos.z);
         mirrorQuat(left.rot.copy(this.shown.rot));
       } else {

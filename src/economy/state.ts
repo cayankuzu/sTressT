@@ -5,8 +5,11 @@ import type { ObjectOrigin } from "../data/types";
 /** A bought tool waiting on the delivery bench in front of the Tool Shop. */
 export type ToolDelivery = { id: string; toolId: string };
 
-/** An intact object taken out of the room in arrange mode (no physical presence until placed). */
-export type StoredObject = { id: string; definitionId: string; origin: ObjectOrigin };
+/**
+ * An object waiting to be delivered to the street drop zone. Only old saves have them: the former
+ * storage (and the v1/v2 object inventory) comes back this way when such a save is loaded.
+ */
+export type ReturningObject = { id: string; definitionId: string; origin: ObjectOrigin };
 
 export type Counters = { object: number; delivery: number; session: number };
 
@@ -27,7 +30,7 @@ export type Statistics = {
 /**
  * The economic half of a save: money, ownership and the reward ledger. The physical world
  * (where every object and piece of debris is) is snapshotted separately; both are written to
- * storage together, so money and the world can never disagree after a reload.
+ * the save together, so money and the world can never disagree after a reload.
  */
 export type ProgressState = {
   credits: number;
@@ -35,7 +38,6 @@ export type ProgressState = {
   ownedTools: string[];
   equippedToolId: string;
   toolDeliveries: ToolDelivery[];
-  storage: StoredObject[];
   /** Street finds already taken (they never come back). */
   claimedFoundItems: string[];
   /**
@@ -68,7 +70,6 @@ export function defaultProgress(): ProgressState {
     ownedTools: [STARTER_TOOL_ID],
     equippedToolId: STARTER_TOOL_ID,
     toolDeliveries: [],
-    storage: [],
     claimedFoundItems: [],
     rewardLedger: [],
     counters: { object: 0, delivery: 0, session: 0 },
@@ -82,7 +83,6 @@ export function cloneProgress(state: ProgressState): ProgressState {
     ...state,
     ownedTools: [...state.ownedTools],
     toolDeliveries: state.toolDeliveries.map((d) => ({ ...d })),
-    storage: state.storage.map((s) => ({ ...s })),
     claimedFoundItems: [...state.claimedFoundItems],
     rewardLedger: [...state.rewardLedger],
     counters: { ...state.counters },

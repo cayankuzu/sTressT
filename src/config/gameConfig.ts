@@ -141,7 +141,6 @@ export const GAME = {
     comboWindow: 2.5,
     comboStep: 0.1,
     comboMaxMultiplier: 1.6,
-    roomCapacity: 40,
     /** Seconds the cleared room stays in break mode (pieces still flying) before cleanup starts. */
     clearedPause: 4,
   },

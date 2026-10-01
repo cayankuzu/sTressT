@@ -101,8 +101,6 @@ export class Destructible {
   pendingCleanup = 0;
   /** While being re-placed in arrange mode, saves use its last committed pose. */
   savePose: { pos: Vector3; quat: Quaternion } | null = null;
-  /** Taken out of storage but not placed yet: not part of the world for saving. */
-  transient = false;
   private meshes: Mesh[] = [];
   private ownsGeometry = false;
   private decals: { geometry: BufferGeometry | null; center: Vector3; record: DecalRecord }[] = [];
@@ -192,11 +190,6 @@ export class Destructible {
 
   get healthRatio(): number {
     return this.state.health / this.state.maxHealth;
-  }
-
-  /** Still exactly as bought (only those can go back into storage). */
-  get pristine(): boolean {
-    return this.state.stage === "intact" && this.state.health >= this.state.maxHealth && this.decals.length === 0 && this.deformUsed === 0 && this.isTemplateShape();
   }
 
   private isTemplateShape(): boolean {
@@ -603,7 +596,7 @@ export class Destructible {
 
   /** Snapshot for the save (null while it is shattering: its pieces are saved instead). */
   serialize(): ObjectRecord | null {
-    if (!this.body || this.breaking || this.transient) return null;
+    if (!this.body || this.breaking) return null;
     const p = this.savePose?.pos ?? this.currPos;
     const q = this.savePose?.quat ?? this.currQuat;
     const untouched = this.isTemplateShape() && this.parts.every((x) => x.hp === x.maxHp);

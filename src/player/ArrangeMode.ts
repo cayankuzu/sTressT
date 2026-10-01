@@ -27,7 +27,7 @@ export function doorClearance(): Box3 {
 const PLACEMENT_FILTER = groups(0xffff, COLLISION.WORLD | COLLISION.PROP | COLLISION.DEBRIS | COLLISION.DEBRIS_SMALL | COLLISION.PLAYER);
 const SURFACE_FILTER = groups(0xffff, COLLISION.WORLD | COLLISION.PROP);
 
-export type PlacementProblem = "blocked" | "support" | "outside" | "door" | "player" | "full";
+export type PlacementProblem = "blocked" | "support" | "outside" | "door" | "player";
 
 /** One collider of a ghost, relative to its body: placement is tested with the real shapes. */
 type GhostShape = { shape: Shape; offset: Vector3; rotation: Quaternion };
@@ -46,8 +46,6 @@ type Passenger = {
 
 type Placing = {
   obj: Destructible;
-  /** Came out of storage (cancel puts it back there) rather than being moved in the room. */
-  fromStorage: boolean;
   startPos: Vector3;
   startQuat: Quaternion;
   shapes: GhostShape[];
@@ -94,11 +92,7 @@ export class ArrangeMode {
   private readonly outlineMaterial = new LineBasicMaterial({ color: COLORS.hover, transparent: true, opacity: 0.85, depthTest: true });
   private hovered: Destructible | null = null;
   private placing: Placing | null = null;
-  /** Whether the room has space for one more object (set by the game). */
-  roomHasSpace: () => boolean = () => true;
-  onCommit: (obj: Destructible, fromStorage: boolean) => void = () => undefined;
-  onCancelStorage: (obj: Destructible) => void = () => undefined;
-  onStore: (obj: Destructible) => void = () => undefined;
+  onCommit: (obj: Destructible) => void = () => undefined;
 
   constructor(
     scene: Scene,
@@ -121,13 +115,13 @@ export class ArrangeMode {
     return { hovered: this.hovered, placing: this.placing?.obj ?? null, problem: this.placing?.problem ?? null };
   }
 
-  /** Starts placing an object (picked in the room, carried in, or taken from storage). */
-  begin(obj: Destructible, fromStorage: boolean): void {
+  /** Starts placing an object (picked in the room or carried in). */
+  begin(obj: Destructible): void {
     if (this.placing || !obj.alive) return;
     const euler = new Euler().setFromQuaternion(obj.currQuat, "YXZ");
     // Whatever stands on it comes along (a cup on a table); anything else touching it is woken so
     // it reacts to the table leaving instead of hanging in the air.
-    const passengers = fromStorage ? [] : this.passengersOf(obj);
+    const passengers = this.passengersOf(obj);
     this.destruction.wakeTouching(obj, passengers);
     for (const other of passengers) this.destruction.wakeTouching(other, [obj, ...passengers]);
     const inv = obj.currQuat.clone().invert();
@@ -143,16 +137,14 @@ export class ArrangeMode {
     }));
     const shapes = ghostShapes(obj);
     obj.setGhost(true);
-    // Until it is committed, a save sees it where it was (or not at all, if it came from storage).
-    obj.savePose = fromStorage ? null : { pos: obj.currPos.clone(), quat: obj.currQuat.clone() };
-    obj.transient = fromStorage;
+    // Until it is committed, a save sees it where it was.
+    obj.savePose = { pos: obj.currPos.clone(), quat: obj.currQuat.clone() };
     for (const r of riders) {
       r.obj.setGhost(true);
       r.obj.savePose = { pos: r.startPos.clone(), quat: r.startQuat.clone() };
     }
     this.placing = {
       obj,
-      fromStorage,
       startPos: obj.currPos.clone(),
       startQuat: obj.currQuat.clone(),
       shapes,
@@ -192,17 +184,12 @@ export class ArrangeMode {
     return found;
   }
 
-  /** Cancels placement: a moved object goes back where it was, a stored one back to storage. */
+  /** Cancels placement: the object goes back where it was. */
   cancel(): void {
     const p = this.placing;
     if (!p) return;
     this.placing = null;
     this.outline.visible = false;
-    if (p.fromStorage) {
-      this.release(p.obj);
-      this.onCancelStorage(p.obj);
-      return;
-    }
     this.release(p.obj);
     p.obj.placeAt(p.startPos, p.startQuat);
     p.obj.setGhost(false);
@@ -223,7 +210,6 @@ export class ArrangeMode {
 
   private release(obj: Destructible): void {
     obj.savePose = null;
-    obj.transient = false;
   }
 
   hide(): void {
@@ -242,11 +228,7 @@ export class ArrangeMode {
       return this.state;
     }
     this.showOutline(this.hovered, this.hovered.currPos, this.hovered.currQuat, COLORS.hover);
-    if (input.pressed("remove")) {
-      this.onStore(this.hovered);
-      return this.state;
-    }
-    if (input.pressed("attack")) this.begin(this.hovered, false);
+    if (input.pressed("attack")) this.begin(this.hovered);
     return this.state;
   }
 
@@ -288,26 +270,13 @@ export class ArrangeMode {
       r.quat.copy(quat).multiply(r.localQuat);
       if (!p.problem) p.problem = this.ridesClear(r);
     }
-    if (!p.problem && p.fromStorage && !this.roomHasSpace()) p.problem = "full";
 
     // The objects themselves are the preview.
     showAt(p.obj, p.pos, quat);
     for (const r of p.passengers) showAt(r.obj, r.pos, r.quat);
     this.showOutline(p.obj, p.pos, quat, p.problem ? COLORS.invalid : COLORS.valid);
 
-    if (input.pressed("kick") || input.pressed("remove")) {
-      if (input.pressed("remove") && !p.fromStorage && p.obj.pristine) {
-        // Delete while placing: straight into storage. What stood on it is put back where it was
-        // and falls to the floor once the object is gone.
-        this.placing = null;
-        this.outline.visible = false;
-        this.release(p.obj);
-        p.obj.placeAt(p.startPos, p.startQuat);
-        p.obj.setGhost(false);
-        this.dropPassengers(p, true);
-        this.onStore(p.obj);
-        return;
-      }
+    if (input.pressed("kick")) {
       this.cancel();
       return;
     }
@@ -320,7 +289,7 @@ export class ArrangeMode {
       // Placed at rest on its support: let it settle and sleep instead of rocking.
       this.destruction.settle(() => p.obj.body);
       this.dropPassengers(p, false);
-      this.onCommit(p.obj, p.fromStorage);
+      this.onCommit(p.obj);
     }
   }
 

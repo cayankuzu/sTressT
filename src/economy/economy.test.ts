@@ -15,8 +15,6 @@ import {
   purchaseTool,
   rewardWithCombo,
   stageReward,
-  storeObject,
-  takeFromStorage,
 } from "./economy";
 import { defaultProgress, type ProgressState } from "./state";
 
@@ -90,13 +88,20 @@ describe("economy", () => {
     expect(claimFoundItem(once.state, "found_road_chair")).toEqual({ ok: false, reason: "already_claimed" });
   });
 
-  it("stores and restores intact objects without duplicating them", () => {
-    const stored = ok(storeObject(defaultProgress(), "obj_000004", "tea_cup", "purchased"));
-    expect(storeObject(stored.state, "obj_000004", "tea_cup", "purchased").ok).toBe(false);
-    const back = ok(takeFromStorage(stored.state, "obj_000004"));
-    expect(back.definitionId).toBe("tea_cup");
-    expect(back.state.storage).toEqual([]);
-    expect(takeFromStorage(back.state, "obj_000004").ok).toBe(false);
+  it("delivers objects left in the former storage of an old save, never twice", () => {
+    const save = newSave("pro_0123456789abcdef", 0, "T", "sav_0123456789abcdef") as unknown as Record<string, unknown>;
+    const progress = save.progress as Record<string, unknown>;
+    progress.storage = [
+      { id: "obj_000007", definitionId: "tea_cup", origin: "found" },
+      { id: "obj_000007", definitionId: "tea_cup", origin: "found" },
+      { id: "obj_000008", definitionId: "no_such_object", origin: "purchased" },
+    ];
+    const v = validateSaveData(save);
+    expect(v?.returning).toEqual([{ id: "obj_000007", definitionId: "tea_cup", origin: "found" }]);
+    expect(v?.progress.counters.object).toBe(7);
+    expect("storage" in (v?.progress ?? {})).toBe(false);
+    // A save written after the delivery has the object in the world: nothing comes again.
+    expect(validateSaveData(newSave("pro_0123456789abcdef", 0, "T", "sav_0123456789abcdef"))?.returning).toBeUndefined();
   });
 
   it("prunes ledger keys of things that no longer exist", () => {
@@ -200,7 +205,7 @@ describe("save data", () => {
     expect(save?.progress.credits).toBe(640);
     expect(save?.progress.ownedTools).toContain("frying_pan");
     expect(save?.objects.map((o) => o.definitionId).sort()).toEqual(["ceramic_vase_01", "crt_tv"]);
-    expect(save?.progress.storage.length).toBe(2);
+    expect(save?.returning?.map((o) => o.definitionId)).toEqual(["tea_cup", "tea_cup"]);
   });
 
   it("detects any change with the checksum, including inside geometry", () => {

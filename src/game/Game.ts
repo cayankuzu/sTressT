@@ -7,7 +7,7 @@ import type { Assets } from "../core/assets";
 import { EventBus } from "../core/events";
 import type { Action, Input } from "../core/input";
 import { getObject, getTool, MATERIALS, OBJECTS, TOOL_IDS } from "../data/catalog";
-import type { MaterialType, ObjectDefinition } from "../data/types";
+import type { MaterialType, ObjectDefinition, ObjectOrigin } from "../data/types";
 import type { Destructible } from "../destruction/Destructible";
 import type { Fragment } from "../destruction/Debris";
 import { DestructionSystem, type StageEvent } from "../destruction/DestructionSystem";
@@ -31,7 +31,6 @@ import { type Payout, Session } from "../session/Session";
 import { createDebugOverlay, type DebugOverlay } from "../ui/debugOverlay";
 import { Hud, type ModeBarItem } from "../ui/hud";
 import { formatCredits, formatDate, formatDuration, objectName, setLanguage, t, type TextKey, toolName } from "../ui/i18n";
-import { storageView } from "../ui/inventory";
 import { type ShopKind, ShopView } from "../ui/shop";
 import { Thumbnails } from "../ui/thumbnails";
 import type { UI } from "../ui/ui";
@@ -66,6 +65,8 @@ const DUST: Record<MaterialType, Color> = Object.fromEntries(
 
 /** Seconds between picking up the last tool and the demo-complete screen. */
 const DEMO_END_DELAY = 1.5;
+/** Pieces that land in the container within this many seconds of each other share one popup. */
+const CLEANUP_POPUP_GATHER = 0.3;
 const DROP_BOX = new Box3();
 const OBJECT_BOX = new Box3();
 
@@ -116,8 +117,6 @@ export class Game {
   private governor!: ResolutionGovernor;
   private shadows!: ShadowScheduler;
   private shop: ShopView | null = null;
-  /** Keeps thumbnail generation running while storage is open. */
-  private shopThumbs = false;
   private readonly shake = new CameraShake();
   private particles!: Particles;
   private kick!: KickSystem;
@@ -138,6 +137,8 @@ export class Game {
   private modeBar: { highlight: Mode; timer: number } | null = null;
   /** Clean-up progress since the last break session ended. */
   private cleanup = { disposed: 0, earned: 0, announced: false };
+  /** Cleanup pay not shown yet: pieces landing in the container together make one popup. */
+  private readonly cleanupPopup = { amount: 0, timer: 0, point: new Vector3() };
   private breakEndTimer = -1;
   private baseFov: number = GAME.player.fov;
   private readonly tmp = new Vector3();
@@ -190,13 +191,7 @@ export class Game {
       this.session.stats.objectsThrown++;
     };
     this.arrange = new ArrangeMode(this.scene, physics.world, this.camera, this.destruction, this.player.collider);
-    this.arrange.roomHasSpace = () => this.objectsInRoom() < GAME.session.roomCapacity;
-    this.arrange.onCommit = (obj, fromStorage) => {
-      if (fromStorage) this.progress.unstore(obj.instanceId);
-      this.saves.request();
-    };
-    this.arrange.onCancelStorage = (obj) => this.destruction.despawn(obj.instanceId);
-    this.arrange.onStore = (obj) => this.storeObject(obj);
+    this.arrange.onCommit = () => this.saves.request();
     this.tools.onHit = (report) => {
       if (report.hit) this.shake.add(this.tools.tool.shake * (report.level === "heavy" ? 0.55 : report.level === "medium" ? 0.4 : 0.25));
     };
@@ -244,6 +239,7 @@ export class Game {
     this.destruction.onLost = () => this.updateModeHud();
     this.destruction.onObjectLost = (obj) => this.recoverObject(obj);
     this.destruction.onObjectGone = () => this.saves.request();
+    this.destruction.onObjectInBin = (obj) => this.hud.showToast(t("toast.binIntact", { name: objectName(obj.definitionId) }), "info", 3);
     this.events.on("ATTACK_STARTED", () => this.audio.swing(this.tools.tool.effectiveMass, this.tools.tool.windup + this.tools.tool.active));
     this.events.on("REWARD_GRANTED", ({ amount }) => this.audio.reward(amount >= 30));
     this.events.on("OBJECT_DESTROYED", ({ definitionId }) => {
@@ -521,11 +517,15 @@ export class Game {
       this.hud.setCredits(save.progress.credits, true);
       await this.destruction.load(save.objects, save.debris);
       await this.bench.show(this.progress.state.toolDeliveries);
+      // An older save may still hold objects with no place in the world (its storage): they
+      // arrive on the sidewalk like a delivery, so nothing the player had is lost.
+      for (const r of save.returning ?? []) await this.deliverObject(r.id, r.definitionId, r.origin);
       this.active = { saveId: save.saveId, profileId: save.profileId, slot: save.slot, name: save.name, createdAt: save.createdAt };
       this.playtime = save.playtimeSeconds;
       this.ctx.profiles.setLastSlot(save.slot);
       this.mode = save.mode === "break" ? "cleanup" : save.mode;
       this.cleanup = { disposed: 0, earned: 0, announced: false };
+      this.cleanupPopup.amount = 0;
       this.breakEndTimer = -1;
       this.room.door.setLocked(false);
       this.viewmodel.setLowered(true);
@@ -553,7 +553,7 @@ export class Game {
     const active = this.active;
     if (!active) return null;
     const world = this.destruction.serialize();
-    const live = new Set<string>([...world.objects.map((o) => o.id), ...world.debris.map((d) => d.id), ...this.progress.state.storage.map((s) => s.id), this.session.id]);
+    const live = new Set<string>([...world.objects.map((o) => o.id), ...world.debris.map((d) => d.id), this.session.id]);
     this.progress.prune(live);
     const p = this.progress.state;
     return {
@@ -588,7 +588,6 @@ export class Game {
     if (!locked) this.hud.showToast(t("toast.captureMouse"), "info", 3);
     this.state = "playing";
     this.shop = null;
-    this.shopThumbs = false;
     this.ctx.ui.setOverlay(null);
     this.hud.setVisible(true);
     this.ctx.physics.resetAccumulator();
@@ -713,13 +712,12 @@ export class Game {
   /** Never stuck: no credits for the cheapest item and nothing left anywhere to break. */
   private safetyAvailable(): boolean {
     if (this.progress.state.credits >= cheapestObjectPrice() || this.deliveriesInFlight > 0) return false;
-    if (this.progress.state.storage.some((s) => OBJECTS[s.definitionId]?.capabilities.destructible)) return false;
     for (const obj of this.destruction.all()) if (obj.alive && obj.template.def.capabilities.destructible) return false;
     return true;
   }
 
   /** A bought object appears on the sidewalk in front of the Object Store, at a free spot. */
-  private async deliverObject(objectId: string, definitionId: string): Promise<void> {
+  private async deliverObject(objectId: string, definitionId: string, origin: ObjectOrigin = "purchased"): Promise<void> {
     this.deliveriesInFlight++;
     try {
       const template = await this.destruction.template(definitionId);
@@ -732,7 +730,7 @@ export class Game {
         await this.destruction.spawn({
           id: objectId,
           definitionId,
-          origin: "purchased",
+          origin,
           position: spot,
           rotation: new Quaternion().setFromEuler(new Euler(0, yaw, 0)),
         });
@@ -813,43 +811,6 @@ export class Game {
     });
   }
 
-  private openStorage(): void {
-    this.enterMenu();
-    this.shopThumbs = true;
-    this.ctx.ui.setOverlay(
-      storageView(this.progress.state.storage, this.objectsInRoom(), this.thumbs, {
-        place: (id) => void this.placeFromStorage(id),
-        close: () => void this.resume(),
-      }),
-    );
-  }
-
-  /** Spawns a stored object as a ghost in front of the player; it leaves storage only once placed. */
-  private async placeFromStorage(id: string): Promise<void> {
-    await this.resume();
-    const item = this.progress.state.storage.find((s) => s.id === id);
-    if (!item) return;
-    this.camera.getWorldDirection(this.aimDir);
-    const feet = this.player.feet;
-    const [ox, , oz] = ROOM.origin;
-    const x = MathUtils.clamp(feet.x + this.aimDir.x * 1.6, ox - ROOM.width / 2 + 0.6, ox + ROOM.width / 2 - 0.6);
-    const z = MathUtils.clamp(feet.z + this.aimDir.z * 1.6, oz - ROOM.depth / 2 + 0.6, oz + ROOM.depth / 2 - 1.2);
-    const obj = await this.destruction.spawn({ id: item.id, definitionId: item.definitionId, origin: item.origin, position: new Vector3(x, 0, z), rotation: new Quaternion() });
-    this.arrange.begin(obj, true);
-    this.destruction.warmup(this.ctx.renderer, this.scene, this.camera);
-  }
-
-  private storeObject(obj: Destructible): void {
-    if (!obj.pristine) {
-      this.hud.showToast(t("toast.cantStore"), "warn");
-      return;
-    }
-    const r = this.progress.store(obj.instanceId, obj.definitionId, obj.origin);
-    if (!r.ok) return;
-    this.destruction.despawn(obj.instanceId);
-    this.hud.showToast(t("toast.stored", { name: objectName(obj.definitionId) }), "good");
-  }
-
   // ================================================================ modes
 
   /** Why `target` cannot be entered right now (null = it can). */
@@ -915,12 +876,6 @@ export class Game {
     const list: Destructible[] = [];
     for (const obj of this.destruction.all()) if (obj.alive && obj.template.def.capabilities.destructible && isInRoom(obj.currPos.x, obj.currPos.z)) list.push(obj);
     return list;
-  }
-
-  private objectsInRoom(): number {
-    let n = 0;
-    for (const obj of this.destruction.all()) if (obj.alive && !obj.transient && isInRoom(obj.currPos.x, obj.currPos.z)) n++;
-    return n;
   }
 
   /** Collectible pieces still to be thrown away (heavy ones included: they must be broken smaller). */
@@ -1022,7 +977,12 @@ export class Game {
 
   private onDisposed(frag: Fragment): void {
     const amount = frag.cleanupValue > 0 ? Math.max(1, Math.round(frag.cleanupValue)) : 0;
-    if (amount > 0 && this.progress.reward(`cln:${frag.id}`, amount)) this.cleanup.earned += amount;
+    if (amount > 0 && this.progress.reward(`cln:${frag.id}`, amount)) {
+      this.cleanup.earned += amount;
+      this.cleanupPopup.amount += amount;
+      this.cleanupPopup.point.copy(frag.currPos);
+      this.cleanupPopup.timer = CLEANUP_POPUP_GATHER;
+    }
     this.cleanup.disposed++;
     this.progress.stat("debrisDisposed");
     this.audio.disposal(frag.material, frag.currPos);
@@ -1037,6 +997,15 @@ export class Game {
     }
     this.updateModeHud();
     this.saves.request();
+  }
+
+  private updateCleanupPopup(dt: number): void {
+    const p = this.cleanupPopup;
+    if (p.amount <= 0) return;
+    p.timer -= dt;
+    if (p.timer > 0) return;
+    this.showPayout({ amount: p.amount, label: "cleanup", name: "", point: [p.point.x, p.point.y + 0.45, p.point.z] });
+    p.amount = 0;
   }
 
   private recoverObject(obj: Destructible): void {
@@ -1111,6 +1080,7 @@ export class Game {
       );
       if (this.state === "playing") {
         this.session.update(frameSeconds);
+        this.updateCleanupPopup(frameSeconds);
         if (this.breakEndTimer > 0) {
           this.breakEndTimer -= frameSeconds;
           if (this.breakEndTimer <= 0 && this.mode === "break") this.setMode("cleanup");
@@ -1149,7 +1119,7 @@ export class Game {
       this.doorWasLocked = this.room.door.locked;
       this.audio.door(this.doorWasLocked, new Vector3(0, 1.2, -6.7));
     }
-    if (this.shop || this.shopThumbs) void this.thumbs.pump();
+    if (this.shop) void this.thumbs.pump();
     this.hud.update(frameSeconds);
 
     if (this.destruction.anyMoving || this.room.door.moving) this.shadows.invalidate(1);
@@ -1227,10 +1197,6 @@ export class Game {
       this.handleHolding(arranging);
     } else if (arranging) {
       this.arrange.update(dt, input);
-      if (input.pressed("inventory") && !this.arrange.busy) {
-        this.openStorage();
-        return;
-      }
       if (!this.arrange.busy && input.pressed("interact")) this.interact();
     } else {
       if (this.arrange.busy) this.arrange.cancel();
@@ -1253,7 +1219,7 @@ export class Game {
     if (!input.pressed("attack") || !held) return;
     if (arranging && held.kind === "object" && isInRoom(held.obj.currPos.x, held.obj.currPos.z)) {
       this.grab.release();
-      this.arrange.begin(held.obj, false);
+      this.arrange.begin(held.obj);
       return;
     }
     this.grab.throw(this.player.worldVelocity);
@@ -1410,10 +1376,6 @@ export class Game {
     const spot = this.nearShop();
     if (spot) {
       this.hud.setPrompt("E", spot.id === "tools" ? t("prompt.enterTools") : t("prompt.enterObjects"));
-      return;
-    }
-    if (this.mode === "arrange" && this.location === "room") {
-      this.hud.setPrompt("I", t("prompt.arrangeIdle"));
       return;
     }
     this.hud.setPrompt(null);

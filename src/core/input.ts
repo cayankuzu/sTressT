@@ -15,8 +15,6 @@ export type Action =
   | "pause"
   | "rotateLeft"
   | "rotateRight"
-  | "remove"
-  | "inventory"
   | "debug"
   | "colliders"
   | "slot1"
@@ -48,12 +46,9 @@ const KEY_MAP: Record<string, Action> = {
   Escape: "pause",
   KeyQ: "rotateLeft",
   KeyF: "rotateRight",
-  Delete: "remove",
-  Backspace: "remove",
   KeyV: "kick",
   // Not Ctrl: Ctrl+W closes the browser tab and cannot be blocked.
   KeyC: "crouch",
-  KeyI: "inventory",
   Backquote: "debug",
   F1: "debug",
   F2: "colliders",

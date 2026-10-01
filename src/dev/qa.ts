@@ -4,7 +4,7 @@
 // It drives the real game through window.__stresst: real swings, real grabs, real physics.
 import { Quaternion, Vector3 } from "three";
 import { GAME } from "../config/gameConfig";
-import { OBJECTS } from "../data/catalog";
+import { OBJECTS, TOOL_IDS } from "../data/catalog";
 import { checkInvariants } from "../economy/economy";
 import { soupStats } from "../destruction/geometry/soup";
 import { ROOM, TRASH } from "../world/layout";
@@ -42,6 +42,38 @@ function finite(o: any): boolean {
 }
 
 /** Fracture runs in a worker: let its results arrive between simulation bursts. */
+/**
+ * Harness runs play in a profile of their own ("QA"), never in a player's slots: switching to it
+ * starts a fresh game in its third slot.
+ */
+async function qaGame(): Promise<void> {
+  const H = h();
+  const qa = H.profiles.meta.profiles.find((p: any) => p.name === "QA") ?? H.profiles.create("QA");
+  if (!qa) throw new Error("no free profile for QA");
+  if (H.profiles.active?.id === qa.id && H.game.state === "playing") return;
+  H.profiles.select(qa.id);
+  await H.newGame(2);
+  await wait(800);
+}
+
+/**
+ * Counts pauses while a harness runs. The pane is shared with the player: a click that captures
+ * and releases the mouse pauses the game, and swings made while paused do nothing. A run with
+ * pauses is not a valid result.
+ */
+function watchPauses(): () => number {
+  const g = h().game;
+  let pauses = 0;
+  g.pause = (...args: unknown[]) => {
+    pauses++;
+    return Object.getPrototypeOf(g).pause.apply(g, args);
+  };
+  return () => {
+    delete g.pause;
+    return pauses;
+  };
+}
+
 async function run(seconds: number): Promise<void> {
   const chunks = Math.max(1, Math.round(seconds / 0.25));
   for (let i = 0; i < chunks; i++) {
@@ -115,7 +147,7 @@ async function auditOne(id: string, tools: string[]): Promise<ObjectRow> {
   row.wake = `${r2(tilt(obj.body.rotation()))}°/${r2(vmax)}m/s/${r2(Math.hypot(p1.x - p0.x, p1.z - p0.z))}m`;
 
   // Arrange: pick, move 1 m, commit; nothing may jump.
-  g.arrange.begin(obj, false);
+  g.arrange.begin(obj);
   H.teleport(1.0, 0, -9.0, 0);
   H.advance(1 / 60);
   aimAt(1.0, 0, -10.4);
@@ -231,11 +263,7 @@ async function auditOne(id: string, tools: string[]): Promise<ObjectRow> {
 export async function objectAudit(ids: string[] = Object.keys(OBJECTS), tools = ["fists", "baseball_bat", "sledgehammer"]): Promise<ObjectRow[]> {
   const H = h();
   H.autoPause(false);
-  if (!H.profiles.active) H.profiles.create("QA");
-  if (H.game.state !== "playing") {
-    await H.newGame(2);
-    await wait(800);
-  }
+  await qaGame();
   H.headless(true);
   H.credits(100000);
   for (const t of tools) H.progress.buyTool(t);
@@ -261,7 +289,7 @@ export async function objectAudit(ids: string[] = Object.keys(OBJECTS), tools = 
 export async function controllerAudit(): Promise<Record<string, unknown>> {
   const H = h();
   const g = H.game;
-  if (g.state !== "playing") await H.newGame(2);
+  await qaGame();
   H.autoPause(false);
   H.headless(true);
   const out: Record<string, unknown> = {};
@@ -363,7 +391,7 @@ export async function controllerAudit(): Promise<Record<string, unknown>> {
 export async function inputAudit(): Promise<Record<string, unknown>> {
   const H = h();
   const g = H.game;
-  if (g.state !== "playing") await H.newGame(2);
+  await qaGame();
   H.autoPause(false);
   H.headless(true);
   const out: Record<string, unknown> = {};
@@ -444,7 +472,7 @@ export async function inputAudit(): Promise<Record<string, unknown>> {
     H.mode("arrange");
     H.advance(0.1);
     const chair = H.destruction.get("starter_chair");
-    g.arrange.begin(chair, false);
+    g.arrange.begin(chair);
     g.pause();
     await g.resume();
     H.advance(0.5);
@@ -483,7 +511,8 @@ export async function playthrough(): Promise<Record<string, unknown>> {
   const H = h();
   const g = H.game;
   H.autoPause(false);
-  if (!H.profiles.active) H.profiles.create("QA");
+  await qaGame();
+  const pauses = watchPauses();
   const errors: string[] = [];
   const onError = (e: ErrorEvent): void => {
     errors.push(String(e.message));
@@ -656,7 +685,125 @@ export async function playthrough(): Promise<Record<string, unknown>> {
   } finally {
     window.removeEventListener("error", onError);
     H.headless(false);
+    const n = pauses();
+    if (n > 0) out.INVALID = `the game was paused ${n} time(s) during the run (mouse captured and released in the pane): run it again`;
   }
   out.errors = errors.length ? errors : "none";
+  return out;
+}
+
+/**
+ * What the physics checks cannot see: every tool really swings in the hands (fists take turns),
+ * the kick shows the boot, and the street container answers both a piece (pay popup) and a whole
+ * object (a toast saying why it stays).
+ */
+export async function feedbackAudit(): Promise<Record<string, unknown>> {
+  const H = h();
+  const g = H.game;
+  H.autoPause(false);
+  await qaGame();
+  H.headless(true);
+  const out: Record<string, unknown> = {};
+  const popups: string[] = [];
+  const toasts: string[] = [];
+  const hud = g.hud;
+  const popup = hud.popup;
+  const toast = hud.showToast;
+  hud.popup = (text: string, label: string, ...rest: unknown[]) => {
+    popups.push(`${text} ${label}`);
+    return popup.call(hud, text, label, ...rest);
+  };
+  hud.showToast = (text: string, ...rest: unknown[]) => {
+    toasts.push(text);
+    return toast.call(hud, text, ...rest);
+  };
+  try {
+    H.credits(100000);
+    for (const id of TOOL_IDS) if (!H.progress.state.ownedTools.includes(id)) H.progress.buyTool(id);
+    H.pickUpAll();
+    H.teleport(0, 0, -8.2, 0);
+    H.look(0, 0);
+    H.advance(0.3);
+    H.mode("break");
+    H.advance(0.6);
+    const vm = g.viewmodel;
+    /** Largest move (m) and turn (1 - |dot|) of a hand during one swing. */
+    const swing = (hand: any): [number, number] => {
+      const p0 = hand.position.clone();
+      const q0 = hand.quaternion.clone();
+      let dp = 0;
+      let dq = 0;
+      H.attack();
+      for (let i = 0; i < 80; i++) {
+        H.advance(1 / 60);
+        if (i === 2) H.release();
+        dp = Math.max(dp, hand.position.distanceTo(p0));
+        dq = Math.max(dq, 1 - Math.abs(hand.quaternion.dot(q0)));
+      }
+      for (let i = 0; i < 60 && g.tools.stage !== "idle"; i++) H.advance(1 / 60);
+      return [dp, dq];
+    };
+    const tools: Record<string, string> = {};
+    for (const id of TOOL_IDS) {
+      await H.equip(id);
+      H.advance(0.5);
+      const [dp, dq] = swing(vm.holder);
+      let row = `${r2(dp)}m/${r2(dq)}`;
+      if (id === "fists") {
+        const [lp] = swing(vm.leftHolder);
+        row += ` left ${r2(lp)}m`;
+        if (lp < 0.1) row += " LEFT STILL";
+      }
+      tools[id] = dp < 0.1 ? `STILL ${row}` : row;
+    }
+    out.tools = tools;
+    H.kick();
+    let boot = false;
+    for (let i = 0; i < 40; i++) {
+      H.advance(1 / 60);
+      if (i === 2) H.key("kick", false);
+      boot ||= vm.boot.visible;
+    }
+    out.kickBoot = boot ? "shown" : "NOT SHOWN";
+
+    // A piece in the container: one popup with the cleanup label, as much as the credits went up.
+    await H.equip("sledgehammer");
+    H.advance(0.3);
+    const vase = await H.destruction.spawn({ id: `qa_fb_vase_${Date.now()}`, definitionId: "ceramic_vase_01", origin: "purchased", position: new Vector3(0, 0.002, -9.6), rotation: new Quaternion() });
+    await run(1);
+    for (let s = 0; s < 8 && vase?.alive; s++) {
+      faceObject(vase, 1.2);
+      H.attack();
+      H.advance(0.05);
+      H.release();
+      for (let i = 0; i < 90 && g.tools.stage !== "idle"; i++) H.advance(1 / 60);
+    }
+    await run(2);
+    H.mode("cleanup");
+    H.advance(0.3);
+    const pieces = H.destruction.debris.majors().filter((f: any) => f.state === "active" && f.body);
+    const before = H.progress.state.credits;
+    popups.length = 0;
+    pieces.forEach((f: any, i: number) => {
+      f.body.setTranslation({ x: TRASH.x - 0.3 + (i % 3) * 0.3, y: TRASH.floorY + 0.4 + Math.floor(i / 3) * 0.2, z: TRASH.z }, true);
+      f.body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+    });
+    await run(3);
+    const gained = H.progress.state.credits - before;
+    const label = popups.filter((p) => p.endsWith(" TEMİZLİK") || p.endsWith(" CLEANUP"));
+    out.binPiece = `${pieces.length} pieces, +${gained} credits, popups ${JSON.stringify(label)}${gained > 0 && label.length === 0 ? " NO POPUP" : ""}`;
+
+    // A whole object in the container: it stays, and the player is told why.
+    const whole = [...H.destruction.all()].find((o: any) => o.alive && o.template.def.mass < 5 && !H.destruction.disposalVolume.containsPoint(o.currPos) && o.currPos.z < 4);
+    toasts.length = 0;
+    whole.body.setTranslation({ x: TRASH.x, y: TRASH.floorY + 0.6, z: TRASH.z }, true);
+    whole.body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+    await run(3);
+    out.binWhole = `${whole.definitionId} alive=${whole.alive} toast=${toasts.length ? JSON.stringify(toasts[0]) : "NONE"}`;
+  } finally {
+    hud.popup = popup;
+    hud.showToast = toast;
+    H.headless(false);
+  }
   return out;
 }

@@ -1,6 +1,6 @@
 import { GAME } from "../config/gameConfig";
 import { OBJECTS, TOOLS } from "../data/catalog";
-import type { ObjectDefinition, ObjectOrigin } from "../data/types";
+import type { ObjectDefinition } from "../data/types";
 import { cloneProgress, type ProgressState } from "./state";
 
 /**
@@ -19,9 +19,7 @@ export type Refusal =
   | "not_for_sale"
   | "no_delivery"
   | "not_owned"
-  | "already_claimed"
-  | "not_stored"
-  | "already_stored";
+  | "already_claimed";
 
 export type Result<T = object> = ({ ok: true; state: ProgressState } & T) | { ok: false; reason: Refusal; missing?: number };
 
@@ -111,23 +109,6 @@ export function claimFoundItem(state: ProgressState, foundId: string): Result {
   return { ok: true, state: next };
 }
 
-/** Arrange mode: an intact object leaves the world and waits in storage. */
-export function storeObject(state: ProgressState, id: string, definitionId: string, origin: ObjectOrigin): Result {
-  if (!OBJECTS[definitionId]) return refuse("unknown_object");
-  if (state.storage.some((s) => s.id === id)) return refuse("already_stored");
-  const next = cloneProgress(state);
-  next.storage.push({ id, definitionId, origin });
-  return { ok: true, state: next };
-}
-
-export function takeFromStorage(state: ProgressState, id: string): Result<{ definitionId: string; origin: ObjectOrigin }> {
-  const item = state.storage.find((s) => s.id === id);
-  if (!item) return refuse("not_stored");
-  const next = cloneProgress(state);
-  next.storage = next.storage.filter((s) => s.id !== id);
-  return { ok: true, state: next, definitionId: item.definitionId, origin: item.origin };
-}
-
 /** A new break session: returns its id (unique for the whole save). */
 export function beginSession(state: ProgressState): Result<{ sessionId: string }> {
   const next = cloneProgress(state);
@@ -157,8 +138,6 @@ export function checkInvariants(state: ProgressState): string[] {
     if (state.ownedTools.includes(d.toolId)) problems.push(`delivered tool already owned ${d.toolId}`);
   }
   if (new Set(state.toolDeliveries.map((d) => d.toolId)).size !== state.toolDeliveries.length) problems.push("duplicate tool delivery");
-  if (new Set(state.storage.map((s) => s.id)).size !== state.storage.length) problems.push("duplicate stored object");
-  for (const s of state.storage) if (!OBJECTS[s.definitionId]) problems.push(`unknown stored object ${s.definitionId}`);
   if (new Set(state.rewardLedger).size !== state.rewardLedger.length) problems.push("duplicate reward key");
   return problems;
 }

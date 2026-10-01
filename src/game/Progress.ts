@@ -1,5 +1,4 @@
 import type { EventBus } from "../core/events";
-import type { ObjectOrigin } from "../data/types";
 import {
   beginSession,
   checkInvariants,
@@ -13,8 +12,6 @@ import {
   purchaseTool,
   type Refusal,
   type Result,
-  storeObject,
-  takeFromStorage,
 } from "../economy/economy";
 import { defaultProgress, type ProgressState, type Statistics } from "../economy/state";
 
@@ -89,14 +86,6 @@ export class Progress {
 
   claimFound(foundId: string): boolean {
     return this.commit(claimFoundItem(this.state, foundId)).ok;
-  }
-
-  store(id: string, definitionId: string, origin: ObjectOrigin): Outcome {
-    return this.commit(storeObject(this.state, id, definitionId, origin));
-  }
-
-  unstore(id: string): Outcome<{ definitionId: string; origin: ObjectOrigin }> {
-    return this.commit(takeFromStorage(this.state, id));
   }
 
   beginSession(): string {

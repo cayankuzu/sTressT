@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { defineConfig, type Plugin } from "vite";
 
@@ -56,9 +56,13 @@ function qaCapture(): Plugin {
   };
 }
 
+const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8")) as { version: string };
+
 export default defineConfig({
   // Relative asset paths so the same build works on a website subfolder and on itch.io.
   base: "./",
+  // Shown on the main menu, so a player (and a bug report) can tell which build is running.
+  define: { __APP_VERSION__: JSON.stringify(version) },
   plugins: [rapierWasm(), qaCapture()],
   optimizeDeps: {
     // Let the plugin above handle Rapier instead of the dev pre-bundler.
